@@ -1,25 +1,31 @@
-export function singleton<T extends { new(...args: unknown[]): {} }>(
-	classType: T
-) {
-	let instance: InstanceType<T> | null = null;
+type Constructor<T = any> = new (...args: any[]) => T
 
-	const proxy = new Proxy(classType, {
-		construct(target: T, args: unknown[], newTarget: Function) {
-			if (instance) {
-				return instance
-			}
+export function singleton<T extends Constructor>(constructor: T) {
+  type Instance = InstanceType<T>
+  let instance: Instance | null = null
 
-			instance = Reflect.construct(target, args, newTarget)
+  // 构造函数代理，拦截 new
+  const proxy = new Proxy(constructor, {
+    construct(target, args, newTarget) {
+      if (instance) return instance
+      instance = Reflect.construct(target, args, newTarget)
+      Object.defineProperty(instance, "constructor", {
+        value: proxy,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+      })
+      return instance as object
+    },
+  })
 
-			Object.defineProperty(instance, "constructor", {
-				value: proxy,
-				writable: false,
-				configurable: false
-			})
+  // 给 proxy 添加静态 getInstance 方法
+  const extended = proxy as T & {
+    getInstance: (...args: ConstructorParameters<T>) => Instance
+  }
 
-			return instance as InstanceType<T>
-		}
-	})
+  extended.getInstance = (...args: ConstructorParameters<T>) =>
+    instance ?? new extended(...args)
 
-	return proxy
+  return extended
 }
