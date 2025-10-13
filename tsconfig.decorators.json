@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
+		"emitDecoratorMetadata": false,
 		"useDefineForClassFields": true
 	}
 }
