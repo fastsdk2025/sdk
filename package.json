@@ -2,6 +2,7 @@
   "name": "@fastsdk2025/sdk",
   "version": "1.0.0",
   "description": "A high-performance CLI for fast development",
+	"type": "module",
   "main": "index.js",
   "scripts": {},
   "keywords": [
