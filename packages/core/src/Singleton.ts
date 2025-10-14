@@ -1,6 +1,6 @@
 export class Singleton {
   private static instance: Singleton;
-  private constructor() {}
+  protected constructor() {}
 
   public static getInstance() {
     if (!Singleton.instance) {
