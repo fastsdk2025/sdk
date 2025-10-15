@@ -7,8 +7,5 @@ export default defineConfig({
 	dts: true,
 	target: "es2020",
 	platform: "node",
-	outDir: "dist",
-	banner: {
-		js: "!#/usr/bin/env node"
-	}
+	outDir: "dist"
 })
