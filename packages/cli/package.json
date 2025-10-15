@@ -2,6 +2,7 @@
   "name": "@fastsdk2025/cli",
   "version": "1.0.0",
   "main": "index.js",
+	"type": "module",
   "scripts": {},
   "keywords": ["CLI", "fast", "quick"],
   "author": "tuiu <13719283454@163.com>",
