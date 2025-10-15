@@ -32,17 +32,23 @@ type LogLevelLiteral = keyof typeof LogLevel;
 type LogLevelPriority = typeof LogLevel[LogLevelLiteral];
 
 class Logger {
-  private constructor() { }
-  public static create() {
-    return new Logger();
+
+  private constructor(
+    private readonly context?: string
+  ) {}
+  public static create(context?: string) {
+    return new Logger(context);
   }
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
-    console.log(
-      this.getDateFormat(),
-      this.getLevelFormat(level),
-      ...this.getMessageFormat(level, ...args)
-    );
+    const line = [];
+    line.push(this.getDateFormat());
+    line.push(this.getLevelFormat(level))
+    if (this.context) {
+      line.push(this.getContextFormat())
+    }
+    line.push(...this.getMessageFormat(level, ...args))
+    console.log(...line);
   }
 
   private getDateFormat() {
@@ -51,6 +57,10 @@ class Logger {
 
   private getLevelFormat(level: LogLevelLiteral) {
     return LogLevel[level].levelColor(` ${level.toUpperCase()} `)
+  }
+
+  private getContextFormat() {
+    return chalk.gray(`[${this.context}]`)
   }
 
   private getMessageFormat(level: LogLevelLiteral, ...args: unknown[]) {
