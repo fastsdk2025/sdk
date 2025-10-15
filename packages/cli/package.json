@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
 	"type": "module",
+	"bin": {
+		"tf": "./dist/index.cjs"
+	},
   "scripts": {
 		"dev": "tsup --sourcemap",
 		"watch": "tsup --sourcemap --watch",
