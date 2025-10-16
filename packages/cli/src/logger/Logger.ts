@@ -3,33 +3,33 @@ import { formatDate } from "./utils/formatDate"
 
 const LogLevel = {
   silent: {
-    priority: 0,
+    priority: -1,
     levelColor: (text: string) => text,
     color: (text: string) => text,
   },
-  info: {
+  error: {
     priority: 10,
+    levelColor: chalk.bgRed.whiteBright.bold,
+    color: chalk.red.bold,
+  },
+  warn: {
+    priority: 20,
+    levelColor: chalk.bgYellow.whiteBright.bold,
+    color: chalk.yellow.bold,
+  },
+  info: {
+    priority: 30,
     levelColor: chalk.bgGreen.whiteBright.bold,
     color: chalk.green.bold,
   },
   debug: {
-    priority: 20,
+    priority: 40,
     levelColor: chalk.bgBlue.whiteBright.bold,
     color: chalk.blue.bold,
   },
-  warn: {
-    priority: 30,
-    levelColor: chalk.bgYellow.whiteBright.bold,
-    color: chalk.yellow.bold,
-  },
-  error: {
-    priority: 40,
-    levelColor: chalk.bgRed.whiteBright.bold,
-    color: chalk.red.bold,
-  },
 } as const
 type LogLevelLiteral = keyof typeof LogLevel;
-type LogLevelPriority = typeof LogLevel[LogLevelLiteral];
+type LogLevelPriority = typeof LogLevel[LogLevelLiteral]["priority"];
 
 class Logger {
 
