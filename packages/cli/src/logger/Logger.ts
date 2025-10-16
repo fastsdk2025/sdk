@@ -79,6 +79,10 @@ class Logger {
     return message
   }
 
+  public setLevel(level: LogLevelLiteral) {
+    this.logLevel = level
+  }
+
   public info(...args: unknown[]) {
     this._log("info", ...args);
   }
