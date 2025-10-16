@@ -29,18 +29,21 @@ const LogLevel = {
   },
 } as const
 type LogLevelLiteral = keyof typeof LogLevel;
-type LogLevelPriority = typeof LogLevel[LogLevelLiteral]["priority"];
 
 class Logger {
 
   private constructor(
+    private logLevel: LogLevelLiteral = 'info',
     private readonly context?: string
   ) {}
-  public static create(context?: string) {
-    return new Logger(context);
+  public static create(logLevel: LogLevelLiteral = "info", context?: string) {
+    return new Logger(logLevel, context);
   }
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
+    if (this.logLevel === "silent") return
+    if (LogLevel[level].priority > LogLevel[this.logLevel].priority)  return
+
     const line = [];
     line.push(this.getDateFormat());
     line.push(this.getLevelFormat(level))
