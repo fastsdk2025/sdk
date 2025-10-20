@@ -7,6 +7,8 @@ import { homedir } from "node:os";
 import { readJSON } from "../../utils/readJSON";
 import { existsSync, rmSync } from "node:fs";
 import { walkFile } from "../../utils/walkFile";
+import { createLogger } from "../../utils/logger";
+import { log } from "node:console";
 
 const cleanCommand = new Command();
 
@@ -14,13 +16,17 @@ cleanCommand
   .name("clean")
   .argument("<configId>", "平台配置ID")
   .action(async (configId: ConfigId) => {
-    console.log("开始清除项目");
+    const logger = createLogger("Clean");
+    logger.info("Start clearing the project: ", configId);
     const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
     if (!projectBase) {
-      throw new Error(
+      logger.error(
         `Could not find xxy.config.json in ${process.cwd()} or any parent directory`,
       );
+      process.exit(1);
     }
+
+    logger.debug("project base: ", projectBase);
 
     let platformDir = join(projectBase, "platform", configId);
     const templateDataPath = join(
@@ -35,20 +41,22 @@ cleanCommand
       `xyx-template-${templateData.cachedVersion}`,
     );
 
+    logger.debug("template path: ", templatePath);
+
     if (existsSync(templatePath)) {
       const { platform } = parseConfigId(configId);
-      console.log("Current Platform: ", platform);
       let platformTemplateCommonPath = join(templatePath, "common", platform);
       if (platform === "hippoo") {
         platformTemplateCommonPath = join(platformTemplateCommonPath, "game");
         platformDir = join(platformDir, "game");
       }
 
+      logger.debug("need remove directory: ", platformDir);
       const targetFiles = walkFile(platformTemplateCommonPath);
       walkFile(
         platformDir,
         (file: string) => {
-          console.log("删除文件: ", file);
+          logger.info("Remove file: ", file);
           rmSync(file, {
             recursive: true,
             force: true,
@@ -63,9 +71,10 @@ cleanCommand
         },
       );
     } else {
-      throw new Error(`Template not found at ${templatePath}`);
+      logger.error(`Template not found at ${templatePath}`);
+      process.exit(1);
     }
-    console.log("清除项目完成");
+    logger.info("Clear project complete");
   });
 
 export default cleanCommand;
