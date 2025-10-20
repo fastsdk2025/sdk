@@ -137,3 +137,10 @@ export type XYXConfig = {
 } & {
   [key: ConfigId]: PlatformConfig;
 };
+
+export interface XYXTemplateData {
+  cachedVersion: string;
+  lastUpdate: number;
+  latestVersion: string;
+  latestVersionCheck: number;
+}
