@@ -15,14 +15,13 @@ cleanCommand
   .argument("<configId>", "平台配置ID")
   .action(async (configId: ConfigId) => {
     console.log("开始清除项目");
-    const xyxPath = getWorkerDir(process.cwd(), "xyx.config.json");
-    if (!xyxPath) {
+    const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
+    if (!projectBase) {
       throw new Error(
         `Could not find xxy.config.json in ${process.cwd()} or any parent directory`,
       );
     }
 
-    const projectBase = dirname(xyxPath);
     let platformDir = join(projectBase, "platform", configId);
     const templateDataPath = join(
       homedir(),
@@ -38,6 +37,7 @@ cleanCommand
 
     if (existsSync(templatePath)) {
       const { platform } = parseConfigId(configId);
+      console.log("Current Platform: ", platform);
       let platformTemplateCommonPath = join(templatePath, "common", platform);
       if (platform === "hippoo") {
         platformTemplateCommonPath = join(platformTemplateCommonPath, "game");
@@ -56,7 +56,7 @@ cleanCommand
         },
         {
           fileFilter(file: string) {
-            return targetFiles
+            return !targetFiles
               .map((t) => t.replace(platformTemplateCommonPath, ""))
               .includes(file.replace(platformDir, ""));
           },
