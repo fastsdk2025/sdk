@@ -16,7 +16,7 @@ cleanCommand
   .name("clean")
   .argument("<configId>", "平台配置ID")
   .action(async (configId: ConfigId) => {
-    const logger = createLogger("Clean");
+    const logger = createLogger("info", "Clean");
     logger.info("Start clearing the project: ", configId);
     const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
     if (!projectBase) {

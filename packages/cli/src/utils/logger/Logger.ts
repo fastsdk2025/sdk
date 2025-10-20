@@ -4,11 +4,17 @@ import { formatDate } from "./formatter";
 import { LogLevel } from "./levels";
 
 export default class Logger {
-  private constructor(private context?: string) {}
-  public static createLogger(context?: string): Logger {
-    return new Logger(context);
+  private constructor(
+    private logLevel: LogLevelLiteral = "info",
+    private context?: string
+  ) {}
+  public static createLogger(logLevel: LogLevelLiteral = "info", context?: string): Logger {
+    return new Logger(logLevel, context);
   }
   private _log(level: LogLevelLiteral, ...message: unknown[]) {
+    if (level === "silent") return;
+    if (LogLevel[this.logLevel].priority >= LogLevel[level].priority) return;
+
     const line: unknown[] = [this.getDate(), LogLevel[level].level()];
     if (this.context) {
       line.push(chalk.gray(`[${this.context}]`));
