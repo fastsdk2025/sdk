@@ -1,0 +1,16 @@
+{
+  "name": "@fastsdk2025/sdk",
+  "version": "1.0.0",
+  "description": "A high-performance CLI for fast development",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "Fast",
+    "Development",
+    "CLI",
+    "Tool"
+  ],
+  "author": "tuiu <13719283454@163.com>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.17.1"
+}
