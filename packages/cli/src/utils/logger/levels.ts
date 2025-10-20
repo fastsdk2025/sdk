@@ -23,7 +23,7 @@ export const LogLevel = {
   },
   silent: {
     level: () => "",
-    piority: -1,
+    priority: -1,
     color: (text: string) => text,
   },
 } as const;
