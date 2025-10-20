@@ -78,6 +78,7 @@ export interface CommonConfig {
 export interface PlatformConfig {
   project_id: string;
   min_platform_version: string;
+  project_name: string;
   version_name: string;
   version_code: string | number;
   home_page?: string;
