@@ -32,6 +32,10 @@ export default class Logger {
     return chalk.dim.gray(`[${formatDate(new Date())}]`);
   }
 
+  public setLevel(level: LogLevelLiteral) {
+    this.logLevel = level;
+  }
+
   public info(...message: unknown[]) {
     this._log("info", ...message);
   }
