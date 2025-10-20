@@ -17,10 +17,16 @@ export function parseConfigId(configId: ConfigId): ConfigInfo {
   let publisher: Publisher = "";
 
   [platform, channel] = configId.split("@") as [Platform, Channel];
+  console.log("parse: ", platform, channel);
 
   if (channel) {
     [channel, publisher] = channel.split("#") as [Channel, Publisher];
+    console.log("parse: ", channel, publisher);
+  } else {
+    [platform, publisher] = platform.split("#") as [Platform, Publisher];
   }
+
+  console.log(platform, channel, publisher);
 
   return {
     platform,
