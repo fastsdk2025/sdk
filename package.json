@@ -12,5 +12,10 @@
   ],
   "author": "tuiu <13719283454@163.com>",
   "license": "MIT",
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
 }
