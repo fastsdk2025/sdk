@@ -4,8 +4,15 @@ import { formatDate } from "./formatter";
 import { LogLevel } from "./levels";
 
 export default class Logger {
+  private constructor(private context?: string) {}
+  public static createLogger(context?: string): Logger {
+    return new Logger(context);
+  }
   private _log(level: LogLevelLiteral, ...message: unknown[]) {
     const line: unknown[] = [this.getDate(), LogLevel[level].level()];
+    if (this.context) {
+      line.push(chalk.gray(`[${this.context}]`));
+    }
     if (typeof message[0] === "string") {
       line.push(LogLevel[level].color(message[0]));
       line.push(...message.slice(1));

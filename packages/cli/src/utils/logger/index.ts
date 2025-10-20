@@ -1,5 +1,5 @@
 import Logger from "./Logger";
 
-const logger = new Logger();
+const logger = Logger.createLogger();
 
 export { logger };
