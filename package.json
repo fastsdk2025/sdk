@@ -14,11 +14,13 @@
   "license": "MIT",
   "packageManager": "pnpm@10.17.1",
   "devDependencies": {
+    "@types/chalk": "^2.2.4",
     "@types/node": "^24.8.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "chalk": "^5.6.2",
     "commander": "^14.0.1"
   }
 }
