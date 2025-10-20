@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { version } from "../package.json";
 import cleanCommand from "./commands/clean";
+import resultCommand from "./commands/result";
 
 async function main() {
   const program = new Command();
@@ -12,6 +13,7 @@ async function main() {
     .version(version, "-V, --version");
 
   program.addCommand(cleanCommand);
+  program.addCommand(resultCommand);
 
   if (process.argv.slice(2).length === 0) {
     program.outputHelp();
