@@ -16,6 +16,8 @@ export class ConfigManager {
 
   private constructor() {
     this.loadConfig();
+
+    process.on("beforeExit", this.flush.bind(this))
   }
 
   public static getInstance(): ConfigManager {
