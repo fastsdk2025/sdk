@@ -9,7 +9,7 @@ export interface OSSCloudConfig {
 }
 
 export type CloudConfig = {
-  oss?: Partial<OSSCloudConfig>;
+  oss?: OSSCloudConfig;
 };
 
 export interface IConfig {
