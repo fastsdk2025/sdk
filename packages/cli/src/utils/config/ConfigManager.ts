@@ -8,9 +8,11 @@ import { writeJSON } from "../writeJSON";
 export class ConfigManager {
   private static readonly CONFIG_DIR = join(homedir(), ".fast")
   private static readonly CONFIG_FILE = join(this.CONFIG_DIR, "config.json")
+  private static readonly DEBOUNCE_DELAY = 100
 
   public static instance: ConfigManager;
   private data!: IConfig;
+  private saveTimeout: NodeJS.Timeout | null = null
 
   private constructor() {
     this.loadConfig();
@@ -39,18 +41,36 @@ export class ConfigManager {
     writeJSON(ConfigManager.CONFIG_FILE, this.data)
   }
 
+  private requestSave(): void {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout)
+    }
+    this.saveTimeout = setTimeout(() => {
+      this.save()
+      this.saveTimeout = null
+    }, ConfigManager.DEBOUNCE_DELAY);
+  }
+
+  public flush(): void {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout)
+    }
+
+    this.save()
+  }
+
   public get<K extends keyof IConfig>(key: K): IConfig[K] {
     return this.data[key]
   }
 
   public set<K extends keyof IConfig>(key: K, value: IConfig[K]): void {
     this.data[key] = value;
-    this.save()
+    this.requestSave()
   }
 
   public delete<K extends keyof IConfig>(key: K): void {
     delete this.data[key]
-    this.save()
+    this.requestSave()
   }
 
   public has<K extends keyof IConfig>(key: K): boolean {
