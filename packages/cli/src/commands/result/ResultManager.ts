@@ -6,7 +6,7 @@ import Logger from "../../utils/logger/Logger";
 import { LogLevelLiteral } from "../../utils/logger/types";
 import { parseConfigId } from "../../utils/parseConfigId";
 import { LinksResult, RenderCtx, ResultOptions } from "./types";
-import { template } from "./template"
+import { template } from "./template";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
@@ -15,79 +15,82 @@ export class ResultManager {
 
   constructor(
     private readonly configId: ConfigId,
-    private readonly options: ResultOptions
+    private readonly options: ResultOptions,
   ) {
-    const { logLevel = "info", message = false } = options
+    const { logLevel = "info", message = false } = options;
 
-    this.logLevel = logLevel
-    this.message = false
+    this.logLevel = logLevel;
+    this.message = false;
 
-    this.logger = Logger.createLogger(this.logLevel, "ResultManager")
+    this.logger = Logger.createLogger(this.logLevel, "ResultManager");
   }
 
   private buildLinks(configId: string, online_url: string): LinksResult {
-    const { publisher } = parseConfigId(configId)
+    const { publisher } = parseConfigId(configId);
 
-    const hostname = publisher ? `${publisher}game` : 'hnyigegame'
-    const host = `http://twww.${hostname}.com/h5games/${hostname}`
+    const hostname = publisher ? `${publisher}game` : "hnyigegame";
+    const host = `http://twww.${hostname}.com/h5games/${hostname}`;
 
-    const url = new URL(online_url)
+    const url = new URL(online_url);
 
-    const cyProjectName = dirname(url.pathname).replace(/^\//, "")
+    const cyProjectName = dirname(url.pathname).replace(/^\//, "");
 
     return {
-      official_advertising_link: `${join(host, cyProjectName, 'index.html')}?env=pre`,
-      test_advertising_link: `${join(host, cyProjectName, 'index.html')}?env=pre&ad_env=preview`,
+      official_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre`,
+      test_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre&ad_env=preview`,
       package_download_address: `${configId}-${cyProjectName.toLocaleLowerCase()}-`,
       game_url: url.href,
-      cyProjectName
-    }
+      cyProjectName,
+    };
   }
 
   private render(ctx: RenderCtx) {
     let out = template;
 
-    (Object.keys(ctx) as Array<keyof RenderCtx>).forEach((key: keyof RenderCtx) => {
-      const value = ctx[key] ?? ''
-      out = out.replace(new RegExp(`{{${key}}}`, 'g'), value)
-    })
+    (Object.keys(ctx) as Array<keyof RenderCtx>).forEach(
+      (key: keyof RenderCtx) => {
+        const value = ctx[key] ?? "";
+        out = out.replace(new RegExp(`{{${key}}}`, "g"), value);
+      },
+    );
 
     return out;
   }
 
   public async show(): Promise<void> {
-    const projectBase = getWorkerDir(process.cwd(), "xyx.config.json")
+    const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
     if (!projectBase) {
       this.logger.error(
-        `Could not find xxy.config.json in ${process.cwd()} or any parent directory`,
+        `Could not find xyx.config.json in ${process.cwd()} or any parent directory`,
       );
       process.exit(1);
     }
 
     this.logger.debug("configId: ", this.configId);
     this.logger.debug("options: ", this.options);
-    this.logger.debug("projectBase: ", projectBase)
+    this.logger.debug("projectBase: ", projectBase);
 
-    const xyxConfig = getXYXConfig(projectBase)
+    const xyxConfig = getXYXConfig(projectBase);
 
-    const cfg = xyxConfig[this.configId]
+    const cfg = xyxConfig[this.configId];
 
     if (!cfg) {
-      this.logger.error(`configId ${this.configId} not found`)
-      process.exit(1)
+      this.logger.error(`configId ${this.configId} not found`);
+      process.exit(1);
     }
 
-    const links = this.buildLinks(this.configId, cfg.online_url as string)
+    const links = this.buildLinks(this.configId, cfg.online_url as string);
     const ctx: RenderCtx = {
       ...links,
       project_name: cfg.project_name,
       platform: `[${this.configId}]`,
       version: cfg.version_name,
-      package_download_address: `${links.package_download_address}${cfg.version_name}.zip`
-    }
+      package_download_address: `${links.package_download_address}${cfg.version_name}.zip`,
+    };
 
-    this.logger.debug(`renderCtx: `, ctx)
-    const result = this.render(ctx)
-    this.logger.info(result)
+    this.logger.debug(`renderCtx: `, ctx);
+    const result = this.render(ctx);
+    console.log(result);
+    this.logger.info(result);
   }
 }
