@@ -5,6 +5,7 @@ export interface OSSCloudConfig {
   apiKey: string;
   apiKeySecret: string;
   bucket: string;
+  domain?: string;
 }
 
 export type CloudConfig = {
