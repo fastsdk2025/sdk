@@ -6,14 +6,17 @@ import { LogLevel } from "./levels";
 export default class Logger {
   private constructor(
     private logLevel: LogLevelLiteral = "info",
-    private context?: string
+    private context?: string,
   ) {}
-  public static createLogger(logLevel: LogLevelLiteral = "info", context?: string): Logger {
+  public static createLogger(
+    logLevel: LogLevelLiteral = "info",
+    context?: string,
+  ): Logger {
     return new Logger(logLevel, context);
   }
   private _log(level: LogLevelLiteral, ...message: unknown[]) {
     if (level === "silent") return;
-    if (LogLevel[this.logLevel].priority >= LogLevel[level].priority) return;
+    if (LogLevel[level].priority < LogLevel[this.logLevel].priority) return;
 
     const line: unknown[] = [this.getDate(), LogLevel[level].level()];
     if (this.context) {
