@@ -8,6 +8,7 @@ import { parseConfigId } from "../../utils/parseConfigId";
 import { LinksResult, RenderCtx, ResultOptions } from "./types";
 import { template } from "./template";
 import { normalizeName } from "../../utils/normalizeName";
+import { copy } from "../../utils/copy";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
@@ -91,7 +92,9 @@ export class ResultManager {
 
     this.logger.debug(`renderCtx: `, ctx);
     const result = this.render(ctx);
-    console.log(result);
+
     this.logger.info(result);
+
+    copy(result);
   }
 }
