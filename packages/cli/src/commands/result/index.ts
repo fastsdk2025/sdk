@@ -1,8 +1,9 @@
 import { Command } from "commander";
 import { ConfigId } from "../../types/xyx";
 import { ResultOptions } from "./types";
+import { ResultManager } from "./ResultManager";
 
-const resultCommand = new Command()
+const resultCommand = new Command();
 
 resultCommand
   .name("result")
@@ -11,7 +12,9 @@ resultCommand
   .option("--log-level", "日志级别", "info")
   .option("-m, --message [message]", "更新日志")
   .action(async (configId: ConfigId, options: ResultOptions) => {
-    console.log("ConfigID: ", configId)
-  })
+    console.log("ConfigID: ", configId);
+    const result = new ResultManager(configId, options);
+    await result.show();
+  });
 
-export default resultCommand
+export default resultCommand;
