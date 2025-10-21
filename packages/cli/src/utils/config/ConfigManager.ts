@@ -4,7 +4,6 @@ import { readJSON } from "../readJSON";
 import { IConfig } from "./types";
 import { ensureDir } from "../ensureDir";
 import { writeJSON } from "../writeJSON";
-import { runInContext } from "node:vm";
 
 export class ConfigManager {
   private static readonly CONFIG_DIR = join(homedir(), ".fast")
@@ -12,7 +11,6 @@ export class ConfigManager {
 
   public static instance: ConfigManager;
   private data!: IConfig;
-  private isDirty = false;
 
   private constructor() {
     this.loadConfig();
