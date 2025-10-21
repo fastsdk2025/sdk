@@ -35,7 +35,7 @@ export class ConfigManager {
       this.data = {
         cloud: {}
       } as IConfig
-      this.save()
+      this.requestSave()
     }
   }
 
