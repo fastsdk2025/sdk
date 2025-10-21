@@ -7,6 +7,7 @@ import { LogLevelLiteral } from "../../utils/logger/types";
 import { parseConfigId } from "../../utils/parseConfigId";
 import { LinksResult, RenderCtx, ResultOptions } from "./types";
 import { template } from "./template";
+import { normalizeName } from "../../utils/normalizeName";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
@@ -38,7 +39,7 @@ export class ResultManager {
     return {
       official_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre`,
       test_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre&ad_env=preview`,
-      package_download_address: `${configId}-${cyProjectName.toLocaleLowerCase()}-`,
+      package_download_address: `${normalizeName(configId)}-${cyProjectName.toLocaleLowerCase()}-`,
       game_url: url.href,
       cyProjectName,
     };
