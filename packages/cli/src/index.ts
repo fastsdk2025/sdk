@@ -2,6 +2,7 @@ import { Command } from "commander";
 import { version } from "../package.json";
 import cleanCommand from "./commands/clean";
 import resultCommand from "./commands/result";
+import uploadCommand from "./commands/upload";
 
 async function main() {
   const program = new Command();
@@ -14,6 +15,7 @@ async function main() {
 
   program.addCommand(cleanCommand);
   program.addCommand(resultCommand);
+  program.addCommand(uploadCommand);
 
   if (process.argv.slice(2).length === 0) {
     program.outputHelp();
