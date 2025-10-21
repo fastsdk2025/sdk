@@ -20,7 +20,7 @@ export class ResultManager {
     const { logLevel = "info", message = false } = options;
 
     this.logLevel = logLevel;
-    this.message = false;
+    this.message = message;
 
     this.logger = Logger.createLogger(this.logLevel, "ResultManager");
   }
