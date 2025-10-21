@@ -9,6 +9,11 @@ import { LinksResult, RenderCtx, ResultOptions } from "./types";
 import { template } from "./template";
 import { normalizeName } from "../../utils/normalizeName";
 import { copy } from "../../utils/copy";
+import { tmpdir } from "node:os";
+import { readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
+import { openEditorAndRead } from "../../utils/openEditorAndRead";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
@@ -46,7 +51,7 @@ export class ResultManager {
     };
   }
 
-  private render(ctx: RenderCtx) {
+  private render(ctx: Partial<RenderCtx>) {
     let out = template;
 
     (Object.keys(ctx) as Array<keyof RenderCtx>).forEach(
@@ -57,6 +62,51 @@ export class ResultManager {
     );
 
     return out;
+  }
+
+  public getMessage() {
+    let changelog = "";
+    if (typeof this.message === "string") {
+      changelog += "更新日志：\n";
+      this.message.split(";").forEach((msg) => {
+        changelog += `+ ${msg}\n`;
+      });
+
+      return changelog;
+    }
+
+    if (this.message === true) {
+      const tmpFile = join(
+        tmpdir(),
+        `xyx-${this.configId}-${randomUUID()}-CHANGELOG.txt`,
+      );
+      writeFileSync(
+        tmpFile,
+        "# 输入发布说明，保存退出即可\n更新日志：",
+        "utf8",
+      );
+
+      const editor = process.env.EDITOR || "nvim";
+      const child = spawnSync(editor, [tmpFile], { stdio: "inherit" });
+
+      if (child.error) {
+        this.logger.error(`Failed to open the editor: `, child.error.message);
+        process.exit(1);
+      }
+
+      changelog = readFileSync(tmpFile, "utf-8")
+        .split("\n")
+        .filter((line) => !line.startsWith("#"))
+        .join("\n")
+        .trim();
+
+      if (!changelog) {
+        this.logger.info("No input was entered. the operation was canceled.");
+        process.exit(0);
+      }
+
+      return changelog;
+    }
   }
 
   public async show(): Promise<void> {
@@ -82,7 +132,7 @@ export class ResultManager {
     }
 
     const links = this.buildLinks(this.configId, cfg.online_url as string);
-    const ctx: RenderCtx = {
+    const ctx: Partial<RenderCtx> = {
       ...links,
       project_name: cfg.project_name,
       platform: `[${this.configId}]`,
@@ -91,10 +141,18 @@ export class ResultManager {
     };
 
     this.logger.debug(`renderCtx: `, ctx);
-    const result = this.render(ctx);
+    let result = this.render(ctx);
+
+    const changelog = await openEditorAndRead("输入发布说明,保存退出即可");
+
+    result = this.render({
+      changelog: changelog || "",
+    });
 
     this.logger.info(result);
 
     copy(result);
+
+    process.exit(0);
   }
 }
