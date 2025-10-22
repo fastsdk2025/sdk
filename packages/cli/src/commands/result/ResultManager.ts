@@ -14,11 +14,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { openEditorAndRead } from "../../utils/openEditorAndRead";
+import { uploader } from "../upload/uploader";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
   private readonly message!: string | boolean;
   private readonly logger!: Logger;
+
+  private result!: string;
 
   constructor(
     private readonly configId: ConfigId,
@@ -28,8 +31,21 @@ export class ResultManager {
 
     this.logLevel = logLevel;
     this.message = message;
+    this.result = template;
 
     this.logger = Logger.createLogger(this.logLevel, "ResultManager");
+  }
+
+  private async uploadZip(
+    projectBase: string,
+    package_download_address: string,
+  ): Promise<string> {
+    const zipPath = join(projectBase, "platform", package_download_address);
+
+    return await uploader(
+      zipPath,
+      `heigame/hippoo/${package_download_address}`,
+    );
   }
 
   private buildLinks(configId: string, online_url: string): LinksResult {
@@ -52,16 +68,14 @@ export class ResultManager {
   }
 
   private render(ctx: Partial<RenderCtx>) {
-    let out = template;
-
     (Object.keys(ctx) as Array<keyof RenderCtx>).forEach(
       (key: keyof RenderCtx) => {
         const value = ctx[key] ?? "";
-        out = out.replace(new RegExp(`{{${key}}}`, "g"), value);
+        this.result = this.result.replace(new RegExp(`{{${key}}}`, "g"), value);
       },
     );
 
-    return out;
+    return this.result;
   }
 
   public getMessage() {
@@ -140,10 +154,28 @@ export class ResultManager {
       package_download_address: `${links.package_download_address}${cfg.version_name}.zip`,
     };
 
+    const zipPath = await this.uploadZip(
+      projectBase,
+      ctx.package_download_address!,
+    );
+
+    ctx.package_download_address = zipPath;
+
     this.logger.debug(`renderCtx: `, ctx);
     let result = this.render(ctx);
 
-    const changelog = await openEditorAndRead("输入发布说明,保存退出即可");
+    let changelog = "";
+    if (this.message === true) {
+      changelog = await openEditorAndRead("输入发布说明,保存退出即可");
+    } else if (typeof this.message === "string") {
+      changelog = "更新日志：\n";
+      this.message
+        .split(/[;；]+/)
+        .map((t) => t.trim())
+        .forEach((msg) => {
+          changelog += `+ ${msg}\n`;
+        });
+    }
 
     result = this.render({
       changelog: changelog || "",
