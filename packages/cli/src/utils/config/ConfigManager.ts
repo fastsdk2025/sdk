@@ -6,76 +6,76 @@ import { ensureDir } from "../ensureDir";
 import { writeJSON } from "../writeJSON";
 
 export class ConfigManager {
-  private static readonly CONFIG_DIR = join(homedir(), ".fast")
-  private static readonly CONFIG_FILE = join(this.CONFIG_DIR, "config.json")
-  private static readonly DEBOUNCE_DELAY = 100
+  private static readonly CONFIG_DIR = join(homedir(), ".fast");
+  private static readonly CONFIG_FILE = join(this.CONFIG_DIR, "config.json");
+  private static readonly DEBOUNCE_DELAY = 100;
 
   public static instance: ConfigManager;
   private data!: IConfig;
-  private saveTimeout: NodeJS.Timeout | null = null
+  private saveTimeout: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.loadConfig();
 
-    process.on("exit", this.flush.bind(this))
+    process.on("exit", this.flush.bind(this));
   }
 
   public static getInstance(): ConfigManager {
     if (!ConfigManager.instance) {
-      ConfigManager.instance = new ConfigManager()
+      ConfigManager.instance = new ConfigManager();
     }
-    return ConfigManager.instance
+    return ConfigManager.instance;
   }
 
   public loadConfig() {
-    ensureDir(dirname(ConfigManager.CONFIG_FILE))
+    ensureDir(dirname(ConfigManager.CONFIG_FILE));
     try {
-      this.data = readJSON<IConfig>(ConfigManager.CONFIG_FILE)
+      this.data = readJSON<IConfig>(ConfigManager.CONFIG_FILE);
     } catch {
       this.data = {
-        cloud: {}
-      } as IConfig
-      this.requestSave()
+        cloud: {},
+      } as IConfig;
+      this.requestSave();
     }
   }
 
   public save() {
-    writeJSON(ConfigManager.CONFIG_FILE, this.data)
+    writeJSON(ConfigManager.CONFIG_FILE, this.data);
   }
 
   private requestSave(): void {
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout)
+      clearTimeout(this.saveTimeout);
     }
     this.saveTimeout = setTimeout(() => {
-      this.save()
-      this.saveTimeout = null
+      this.save();
+      this.saveTimeout = null;
     }, ConfigManager.DEBOUNCE_DELAY);
   }
 
   public flush(): void {
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout)
+      clearTimeout(this.saveTimeout);
     }
 
-    this.save()
+    this.save();
   }
 
   public get<K extends keyof IConfig>(key: K): IConfig[K] {
-    return this.data[key]
+    return this.data[key];
   }
 
   public set<K extends keyof IConfig>(key: K, value: IConfig[K]): void {
     this.data[key] = value;
-    this.requestSave()
+    this.requestSave();
   }
 
   public delete<K extends keyof IConfig>(key: K): void {
-    delete this.data[key]
-    this.requestSave()
+    delete this.data[key];
+    this.requestSave();
   }
 
   public has<K extends keyof IConfig>(key: K): boolean {
-    return key in this.data
+    return key in this.data;
   }
 }

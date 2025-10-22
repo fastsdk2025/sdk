@@ -1,4 +1,3 @@
-import { InvalidOptionArgumentError } from "commander";
 import { LogLevelLiteral } from "../../utils/logger/types";
 
 export interface ResultOptions {

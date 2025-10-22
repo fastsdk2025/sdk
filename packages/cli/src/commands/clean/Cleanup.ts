@@ -8,37 +8,41 @@ import { readJSON } from "../../utils/readJSON";
 import { existsSync, readdirSync, rmSync } from "node:fs";
 import { parseConfigId } from "../../utils/parseConfigId";
 
-
 class Cleanup {
   private readonly logger!: Logger;
   private templatePath!: string;
 
   constructor(options: CleanOptions) {
-    this.logger = Logger.createLogger(options.logLevel, "Cleanup")
+    this.logger = Logger.createLogger(options.logLevel, "Cleanup");
   }
 
   private getTemplatePath() {
-    const templateDataPath = join(homedir(), ".xyx-cli", "template", "data.json")
-    const templateData = readJSON<XYXTemplateData>(templateDataPath)
+    const templateDataPath = join(
+      homedir(),
+      ".xyx-cli",
+      "template",
+      "data.json",
+    );
+    const templateData = readJSON<XYXTemplateData>(templateDataPath);
     const templatePath = join(
       dirname(templateDataPath),
-      `xyx-template-${templateData.cachedVersion}`
-    )
+      `xyx-template-${templateData.cachedVersion}`,
+    );
 
     if (!existsSync(templateDataPath)) {
-      this.logger.error("Template data file not found.")
+      this.logger.error("Template data file not found.");
       process.exit(1);
     }
 
-    this.logger.debug("template path: ", templatePath)
-    return templatePath
+    this.logger.debug("template path: ", templatePath);
+    return templatePath;
   }
 
   public async clean(configId: string): Promise<void> {
-    this.logger.info("Project cleanup started for config ID:", configId)
+    this.logger.info("Project cleanup started for config ID:", configId);
 
     // 获取项目根目录
-    const projectBase = getWorkerDir(process.cwd(), "xyx.config.json")
+    const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
     if (!projectBase) {
       this.logger.error(
         `Could not find xxy.config.json in ${process.cwd()} or any parent directory`,
@@ -47,35 +51,39 @@ class Cleanup {
     }
 
     // 获取模板地址
-    this.templatePath = this.getTemplatePath()
+    this.templatePath = this.getTemplatePath();
 
-    const { platform } = parseConfigId(configId)
-    let targetDir = join(projectBase, "platform", configId)
-    let platformTemplateCommonPath = join(this.templatePath, "common", platform)
+    const { platform } = parseConfigId(configId);
+    let targetDir = join(projectBase, "platform", configId);
+    let platformTemplateCommonPath = join(
+      this.templatePath,
+      "common",
+      platform,
+    );
 
     if (platform === "hippoo") {
-      platformTemplateCommonPath = join(platformTemplateCommonPath, "game")
-      targetDir = join(targetDir, "game")
+      platformTemplateCommonPath = join(platformTemplateCommonPath, "game");
+      targetDir = join(targetDir, "game");
     }
 
     const platformFiles = readdirSync(platformTemplateCommonPath);
-    const targetFiles = readdirSync(targetDir)
+    const targetFiles = readdirSync(targetDir);
 
     targetFiles
-      .filter(t => {
-        return !platformFiles.includes(t)
+      .filter((t) => {
+        return !platformFiles.includes(t);
       })
-      .forEach(name => {
-        const fullPath = join(targetDir, name)
-        this.logger.info("Remove File: ", fullPath)
+      .forEach((name) => {
+        const fullPath = join(targetDir, name);
+        this.logger.info("Remove File: ", fullPath);
         rmSync(fullPath, {
           recursive: true,
-          force: true
-        })
-      })
+          force: true,
+        });
+      });
 
-    this.logger.info("Project cleanup completed.")
+    this.logger.info("Project cleanup completed.");
   }
 }
 
-export default Cleanup
+export default Cleanup;

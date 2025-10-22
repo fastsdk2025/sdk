@@ -1,5 +1,4 @@
-export const template =
-`
+export const template = `
 {{project_name}} {{platform}} {{version}}
 
 广告逻辑: 延用原游戏广告逻辑
@@ -15,4 +14,4 @@ zip下载地址: {{package_download_address}}
 game url地址: {{game_url}}
 
 @林珣
-`
+`;
