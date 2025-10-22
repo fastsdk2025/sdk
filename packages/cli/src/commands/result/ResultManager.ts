@@ -11,7 +11,7 @@ import { normalizeName } from "../../utils/normalizeName";
 import { copy } from "../../utils/copy";
 import { openEditorAndRead } from "../../utils/openEditorAndRead";
 import { uploader } from "../upload/uploader";
-import { readdir, stat } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
