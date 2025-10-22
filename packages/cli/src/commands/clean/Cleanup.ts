@@ -23,16 +23,15 @@ class Cleanup {
       "template",
       "data.json",
     );
+    if (!existsSync(templateDataPath)) {
+      this.logger.error("Template data file not found.");
+      process.exit(1);
+    }
     const templateData = readJSON<XYXTemplateData>(templateDataPath);
     const templatePath = join(
       dirname(templateDataPath),
       `xyx-template-${templateData.cachedVersion}`,
     );
-
-    if (!existsSync(templateDataPath)) {
-      this.logger.error("Template data file not found.");
-      process.exit(1);
-    }
 
     this.logger.debug("template path: ", templatePath);
     return templatePath;
