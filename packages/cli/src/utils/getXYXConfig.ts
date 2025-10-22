@@ -4,7 +4,6 @@ import { readJSON } from "./readJSON";
 import { join } from "node:path";
 
 export function getXYXConfig(base: string): XYXConfig {
-  console.log("getXYXConfig", base);
   const configPath = getWorkerDir(base, "xyx.config.json");
   if (!configPath) {
     throw new Error(

@@ -12,7 +12,6 @@ resultCommand
   .option("--log-level <level>", "日志级别", "info")
   .option("-m, --message [message]", "更新日志")
   .action(async (configId: ConfigId, options: ResultOptions) => {
-    console.log("ConfigID: ", configId);
     const result = new ResultManager(configId, options);
     await result.show();
   });
