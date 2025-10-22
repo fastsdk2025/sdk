@@ -1,5 +1,5 @@
 import { dirname, join } from "node:path";
-import { ConfigId } from "../../types/xyx";
+import { ConfigId, PlatformConfig } from "../../types/xyx";
 import { getWorkerDir } from "../../utils/getWorkerDir";
 import { getXYXConfig } from "../../utils/getXYXConfig";
 import Logger from "../../utils/logger/Logger";
@@ -19,9 +19,7 @@ export class ResultManager {
   private readonly logger!: Logger;
 
   private readonly remotePrefix = "heigame/hippoo";
-  private readonly templateStr: string = template;
-
-  private result!: string;
+  private templateStr: string = template;
 
   constructor(
     private readonly configId: ConfigId,
@@ -31,73 +29,49 @@ export class ResultManager {
 
     this.logLevel = logLevel;
     this.message = message;
-    this.result = template;
 
     this.logger = Logger.createLogger(this.logLevel, "ResultManager");
   }
 
   private async uploadZip(
     projectBase: string,
-    packageDownloadName: string,
+    configId: string,
+    cyProjectName: string,
+    cfg: PlatformConfig,
   ): Promise<string> {
     const platformDir = join(projectBase, "platform");
-    const expectedLocal = join(platformDir, packageDownloadName);
-
-    try {
-      const st = await stat(expectedLocal);
-      if (st.isFile()) {
-        this.logger.debug(`Found expected zip at ${expectedLocal}`);
-        const remoteName = normalizeName(packageDownloadName);
-        const remotePath = join(platformDir, remoteName);
-        this.logger.debug(`Normalized remote name: ${remoteName}`);
-        return await uploader(expectedLocal, remotePath);
-      }
-      this.logger.debug(
-        `Expected path exists but is not a file: ${expectedLocal}`,
-      );
-    } catch (error) {
-      this.logger.debug(
-        `Expected zip not found at ${expectedLocal}: ${String(error)}`,
-      );
-    }
-
     try {
       const entries = await readdir(platformDir);
+      const suffix = `${cyProjectName.toLowerCase()}-${cfg.version_name}.zip`;
+      const normalizedId = normalizeName(configId);
+
       const candidate = entries.find((name) => {
-        return (
-          name === packageDownloadName ||
-          name.startsWith(packageDownloadName) ||
-          name.includes(packageDownloadName.replace(/\.zip$/, ""))
+        return [normalizedId, configId].some(
+          (id) => name === `${id}-${suffix}`,
         );
       });
 
-      if (candidate) {
-        const candidatePath = join(platformDir, candidate);
-        try {
-          const st2 = await stat(candidatePath);
-          if (st2.isFile()) {
-            this.logger.debug(`Found fallback zip at ${candidatePath}`);
-            const remoteName = normalizeName(candidate);
-            const remotePath = join(this.remotePrefix, remoteName);
-            return await uploader(candidatePath, remotePath);
-          }
-        } catch (error) {
-          this.logger.debug(
-            `Candidate found but stat failed: ${candidatePath}`,
-          );
-        }
-      } else {
-        this.logger.error(
-          `No matching zip found in platfor dir: ${platformDir}`,
-        );
+      if (!candidate) {
+        this.logger.warn("No matching zip file found");
       }
+
+      const localPath = join(platformDir, candidate as string);
+      const remoteName = normalizeName(candidate as string);
+      const remotePath = join(this.remotePrefix, remoteName);
+
+      this.logger.debug("Prepare to upload: ");
+      this.logger.debug("Local Path: ", localPath);
+      this.logger.debug("Remote Path: ", remotePath);
+
+      const resultUrl = await uploader(localPath, remotePath);
+      this.logger.info(`Uploaded to ${resultUrl}`);
+
+      return resultUrl;
     } catch (error) {
-      this.logger.error(
-        `Failed to read platform dir ${platformDir}: ${String(error)}`,
-      );
+      this.logger.error("Failed to upload zip file", error);
     }
 
-    process.exit(1);
+    return "";
   }
 
   private buildLinks(configId: string, online_url: string): LinksResult {
@@ -113,7 +87,6 @@ export class ResultManager {
     return {
       official_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre`,
       test_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre&ad_env=preview`,
-      package_download_address: `${configId}-${cyProjectName.toLocaleLowerCase()}-`,
       game_url: url.href,
       cyProjectName,
     };
@@ -123,11 +96,33 @@ export class ResultManager {
     (Object.keys(ctx) as Array<keyof RenderCtx>).forEach(
       (key: keyof RenderCtx) => {
         const value = ctx[key] ?? "";
-        this.result = this.result.replace(new RegExp(`{{${key}}}`, "g"), value);
+        this.templateStr = this.templateStr.replace(
+          new RegExp(`{{${key}}}`, "g"),
+          value,
+        );
       },
     );
 
-    return this.result;
+    return this.templateStr;
+  }
+
+  private async buildChangelog() {
+    if (this.message === true) {
+      return await openEditorAndRead("输入发布说明,保存退出即可");
+    }
+    if (typeof this.message === "string") {
+      return (
+        "更新日志: \n" +
+        this.message
+          .split("\n")
+          .map((t) => t.trim())
+          .filter(Boolean)
+          .map((t) => `- ${t}`)
+          .join("\n")
+      );
+    }
+
+    return "";
   }
 
   public async show(): Promise<void> {
@@ -158,40 +153,20 @@ export class ResultManager {
       project_name: cfg.project_name,
       platform: `[${this.configId}]`,
       version: cfg.version_name,
-      package_download_address: `${links.package_download_address}${cfg.version_name}.zip`,
+      package_download_address: await this.uploadZip(
+        projectBase,
+        this.configId,
+        links.cyProjectName,
+        cfg,
+      ),
+      changelog: await this.buildChangelog(),
     };
 
-    const zipPath = await this.uploadZip(
-      projectBase,
-      ctx.package_download_address!,
-    );
-
-    ctx.package_download_address = zipPath;
-
     this.logger.debug(`renderCtx: `, ctx);
-    let result = this.render(ctx);
 
-    let changelog = "";
-    if (this.message === true) {
-      changelog = await openEditorAndRead("输入发布说明,保存退出即可");
-    } else if (typeof this.message === "string") {
-      changelog = "更新日志：\n";
-      this.message
-        .split(/[;；]+/)
-        .map((t) => t.trim())
-        .forEach((msg) => {
-          changelog += `+ ${msg}\n`;
-        });
-    }
-
-    result = this.render({
-      changelog: changelog || "",
-    });
-
-    this.logger.info(result);
-
-    copy(result);
-
+    let final = this.render(ctx);
+    this.logger.info(final);
+    copy(final);
     process.exit(0);
   }
 }

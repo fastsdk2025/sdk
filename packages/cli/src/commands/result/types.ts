@@ -9,7 +9,6 @@ export interface ResultOptions {
 export interface LinksResult {
   official_advertising_link: string;
   test_advertising_link: string;
-  package_download_address: string;
   game_url: string;
   cyProjectName: string;
 }
@@ -18,5 +17,6 @@ export interface RenderCtx extends Omit<LinksResult, "cyProjectName"> {
   project_name: string;
   platform: string;
   version: string;
-  changelog?: string;
+  package_download_address: string;
+  changelog: string;
 }
