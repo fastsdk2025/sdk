@@ -4,12 +4,14 @@ import { readJSON } from "./readJSON";
 import { join } from "node:path";
 
 export function getXYXConfig(base: string): XYXConfig {
-  const configPath = getWorkerDir(base, "xyx.config.json");
-  if (!configPath) {
+  const projectBase = getWorkerDir(base, "xyx.config.json");
+  if (!projectBase) {
     throw new Error(
       `Could not find xyx.config.json in ${base} or any parent directory`,
     );
   }
 
-  return readJSON<XYXConfig>(join(configPath, "xyx.config.json"));
+  const configPath = join(projectBase, "xyx.config.json");
+
+  return readJSON<XYXConfig>(configPath);
 }
