@@ -23,6 +23,7 @@ export class ResultManager {
   private readonly logger!: Logger;
 
   private readonly remotePrefix = "heigame/hippoo";
+  private readonly templateStr: string = template;
 
   private result!: string;
 
@@ -41,30 +42,65 @@ export class ResultManager {
 
   private async uploadZip(
     projectBase: string,
-    package_download_address: string,
+    packageDownloadName: string,
   ): Promise<string> {
     const platformDir = join(projectBase, "platform");
-    const expectedLocal = join(platformDir, package_download_address);
+    const expectedLocal = join(platformDir, packageDownloadName);
 
     try {
       const st = await stat(expectedLocal);
       if (st.isFile()) {
         this.logger.debug(`Found expected zip at ${expectedLocal}`);
-        const remoteName = normalizeName(package_download_address);
-        console.log(remoteName);
-        return await uploader(
-          expectedLocal,
-          join(this.remotePrefix, remoteName),
-        );
+        const remoteName = normalizeName(packageDownloadName);
+        const remotePath = join(platformDir, remoteName);
+        this.logger.debug(`Normalized remote name: ${remoteName}`);
+        return await uploader(expectedLocal, remotePath);
       }
-      this.logger.error(
-        `Expected zip not found at ${expectedLocal}, searching platform dir...`,
+      this.logger.debug(
+        `Expected path exists but is not a file: ${expectedLocal}`,
       );
     } catch (error) {
-      this.logger.error(
-        `Expected zip not found at ${expectedLocal}, searching platform dir...`,
+      this.logger.debug(
+        `Expected zip not found at ${expectedLocal}: ${String(error)}`,
       );
     }
+
+    try {
+      const entries = await readdir(platformDir);
+      const candidate = entries.find((name) => {
+        return (
+          name === packageDownloadName ||
+          name.startsWith(packageDownloadName) ||
+          name.includes(packageDownloadName.replace(/\.zip$/, ""))
+        );
+      });
+
+      if (candidate) {
+        const candidatePath = join(platformDir, candidate);
+        try {
+          const st2 = await stat(candidatePath);
+          if (st2.isFile()) {
+            this.logger.debug(`Found fallback zip at ${candidatePath}`);
+            const remoteName = normalizeName(candidate);
+            const remotePath = join(this.remotePrefix, remoteName);
+            return await uploader(candidatePath, remotePath);
+          }
+        } catch (error) {
+          this.logger.debug(
+            `Candidate found but stat failed: ${candidatePath}`,
+          );
+        }
+      } else {
+        this.logger.error(
+          `No matching zip found in platfor dir: ${platformDir}`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to read platform dir ${platformDir}: ${String(error)}`,
+      );
+    }
+
     process.exit(1);
   }
 
