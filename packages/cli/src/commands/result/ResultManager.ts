@@ -15,11 +15,14 @@ import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { openEditorAndRead } from "../../utils/openEditorAndRead";
 import { uploader } from "../upload/uploader";
+import { readdir, stat } from "node:fs/promises";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
   private readonly message!: string | boolean;
   private readonly logger!: Logger;
+
+  private readonly remotePrefix = "heigame/hippoo";
 
   private result!: string;
 
@@ -40,12 +43,29 @@ export class ResultManager {
     projectBase: string,
     package_download_address: string,
   ): Promise<string> {
-    const zipPath = join(projectBase, "platform", package_download_address);
+    const platformDir = join(projectBase, "platform");
+    const expectedLocal = join(platformDir, package_download_address);
 
-    return await uploader(
-      zipPath,
-      `heigame/hippoo/${package_download_address}`,
-    );
+    try {
+      const st = await stat(expectedLocal);
+      if (st.isFile()) {
+        this.logger.debug(`Found expected zip at ${expectedLocal}`);
+        const remoteName = normalizeName(package_download_address);
+        console.log(remoteName);
+        return await uploader(
+          expectedLocal,
+          join(this.remotePrefix, remoteName),
+        );
+      }
+      this.logger.error(
+        `Expected zip not found at ${expectedLocal}, searching platform dir...`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Expected zip not found at ${expectedLocal}, searching platform dir...`,
+      );
+    }
+    process.exit(1);
   }
 
   private buildLinks(configId: string, online_url: string): LinksResult {
@@ -61,7 +81,7 @@ export class ResultManager {
     return {
       official_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre`,
       test_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre&ad_env=preview`,
-      package_download_address: `${normalizeName(configId)}-${cyProjectName.toLocaleLowerCase()}-`,
+      package_download_address: `${configId}-${cyProjectName.toLocaleLowerCase()}-`,
       game_url: url.href,
       cyProjectName,
     };
@@ -76,51 +96,6 @@ export class ResultManager {
     );
 
     return this.result;
-  }
-
-  public getMessage() {
-    let changelog = "";
-    if (typeof this.message === "string") {
-      changelog += "更新日志：\n";
-      this.message.split(";").forEach((msg) => {
-        changelog += `+ ${msg}\n`;
-      });
-
-      return changelog;
-    }
-
-    if (this.message === true) {
-      const tmpFile = join(
-        tmpdir(),
-        `xyx-${this.configId}-${randomUUID()}-CHANGELOG.txt`,
-      );
-      writeFileSync(
-        tmpFile,
-        "# 输入发布说明，保存退出即可\n更新日志：",
-        "utf8",
-      );
-
-      const editor = process.env.EDITOR || "nvim";
-      const child = spawnSync(editor, [tmpFile], { stdio: "inherit" });
-
-      if (child.error) {
-        this.logger.error(`Failed to open the editor: `, child.error.message);
-        process.exit(1);
-      }
-
-      changelog = readFileSync(tmpFile, "utf-8")
-        .split("\n")
-        .filter((line) => !line.startsWith("#"))
-        .join("\n")
-        .trim();
-
-      if (!changelog) {
-        this.logger.info("No input was entered. the operation was canceled.");
-        process.exit(0);
-      }
-
-      return changelog;
-    }
   }
 
   public async show(): Promise<void> {
