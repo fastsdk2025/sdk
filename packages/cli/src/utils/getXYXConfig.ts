@@ -7,7 +7,7 @@ export function getXYXConfig(base: string): XYXConfig {
   const configPath = getWorkerDir(base, "xyx.config.json");
   if (!configPath) {
     throw new Error(
-      `Could not find xxy.config.json in ${base} or any parent directory`,
+      `Could not find xyx.config.json in ${base} or any parent directory`,
     );
   }
 
