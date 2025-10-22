@@ -1,6 +1,10 @@
 export type CloudType = "oss";
 
-export interface OSSCloudConfig {
+export interface BaseCloudConfig {
+  uploadRetries: number;
+}
+
+export interface OSSCloudConfig extends Partial<BaseCloudConfig> {
   region: string;
   apiKey: string;
   apiKeySecret: string;
