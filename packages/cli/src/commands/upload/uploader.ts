@@ -11,7 +11,7 @@ export async function uploader(file: string, destName?: string) {
 
   if (!ossConfig) {
     logger.error("No cloud.oss configuration found");
-    process.exit(0);
+    process.exit(1);
   }
 
   logger.debug("cloud.oss configuration: ", ossConfig);
