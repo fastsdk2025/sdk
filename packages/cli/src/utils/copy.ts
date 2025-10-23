@@ -1,11 +1,14 @@
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { isCommandAvailable } from "./isCommandAvailable";
 
-export function copy(content: string): void {
+export function copy(content: string | Buffer): void {
+  const input =
+    typeof content === "string" ? Buffer.from(content, "utf8") : content;
+
   switch (process.platform) {
     case "win32":
       if (isCommandAvailable("clip")) {
-        execSync(`echo "${content}" | clip`);
+        spawnSync("clip", { input });
       } else {
         throw new Error(
           // `Unable to execute command: clip. Please check whether the command is registered in the system environment variables.`,
@@ -15,7 +18,7 @@ export function copy(content: string): void {
       break;
     case "darwin":
       if (isCommandAvailable("pbcopy")) {
-        execSync(`echo "${content}" | pbcopy`);
+        spawnSync("pbcopy", { input });
       } else {
         throw new Error(
           // `Unable to execute command: pbcopy. Please check whether the command is registered in the system environment variables.`,
@@ -28,9 +31,9 @@ export function copy(content: string): void {
       break;
     default:
       if (isCommandAvailable("xclip")) {
-        execSync(`echo "${content}" | xclip -selection clipboard`);
+        spawnSync("xclip", ["-selection", "clipboard"], { input });
       } else if (isCommandAvailable("xsel")) {
-        execSync(`echo "${content}" | xsel -b`);
+        spawnSync("xsel", ["-b"], { input });
       } else {
         throw new Error(
           // `Unable to execute command: xclip. Please check whether the command is registered in the system environment variables.`,
