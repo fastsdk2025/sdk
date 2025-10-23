@@ -5,7 +5,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@commands/*": ["src/commands/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@core/*": ["src/core/*"]
     }
   }
 }
