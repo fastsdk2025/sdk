@@ -1,0 +1,58 @@
+import Service from "@core/Service";
+import { LogLevelLiteral } from "./types";
+import { LogLevel } from "./levels";
+import chalk from "chalk";
+import { formatDate } from "@/utils/formatDate";
+
+export default class LoggerService extends Service {
+  private logLevel: LogLevelLiteral = "info";
+  private context?: string;
+
+  private _log(level: LogLevelLiteral, ...args: unknown[]) {
+    if (level === "silent") return
+    if (LogLevel[level].priority < LogLevel[this.logLevel].priority) return
+
+    const line: unknown[] = [this.getDate(), LogLevel[level].level()];
+
+    if (this.context) {
+      line.push(chalk.gray(`[${this.context}]`))
+    }
+
+    if (typeof args[0] === "string") {
+      line.push(LogLevel[level].color(args[0]))
+      line.push(...args.slice(1))
+    } else {
+      line.push(...args)
+    }
+
+    console.log(...line)
+  }
+
+  private getDate() {
+    return chalk.dim.gray(`[${formatDate(new Date())}]`)
+  }
+
+  public setLevel(logLevel: LogLevelLiteral) {
+    this.logLevel = logLevel
+  }
+
+  public setContext(context: string) {
+    this.context = context
+  }
+
+  public info(...args: unknown[]) {
+    this._log("info", ...args)
+  }
+
+  public debug(...args: unknown[]) {
+    this._log("debug", ...args)
+  }
+
+  public warn(...args: unknown[]) {
+    this._log("warn", ...args)
+  }
+
+  public error(...args: unknown[]) {
+    this._log("error", ...args)
+  }
+}
