@@ -1,9 +1,9 @@
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { readJSON } from "../readJSON";
+import { readJSON } from "@/utils/readJSON";
 import { IConfig } from "./types";
-import { ensureDir } from "../ensureDir";
-import { writeJSON } from "../writeJSON";
+import { ensureDir } from "@/utils/ensureDir";
+import { writeJSON } from "@/utils/writeJSON";
 
 export class ConfigManager {
   private static readonly CONFIG_DIR = join(homedir(), ".fast");

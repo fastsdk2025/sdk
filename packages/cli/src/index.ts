@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { version } from "../package.json";
-import cleanCommand from "./commands/clean";
-import resultCommand from "./commands/result";
-import uploadCommand from "./commands/upload";
+import cleanCommand from "@/commands/clean";
+import resultCommand from "@/commands/result";
+import uploadCommand from "@/commands/upload";
 
 async function main() {
   const program = new Command();

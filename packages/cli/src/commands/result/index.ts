@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { ConfigId } from "../../types/xyx";
+import { ConfigId } from "@/types/xyx";
 import { ResultOptions } from "./types";
 import { ResultManager } from "./ResultManager";
 

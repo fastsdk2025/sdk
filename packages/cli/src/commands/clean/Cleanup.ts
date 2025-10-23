@@ -1,12 +1,12 @@
 import { dirname, join } from "node:path";
-import { ConfigId, XYXTemplateData } from "../../types/xyx";
-import { getWorkerDir } from "../../utils/getWorkerDir";
-import Logger from "../../utils/logger/Logger";
+import { ConfigId, XYXTemplateData } from "@/types/xyx";
+import { getWorkerDir } from "@/utils/getWorkerDir";
+import Logger from "@/utils/logger/Logger";
 import { CleanOptions } from "./types";
 import { homedir } from "node:os";
-import { readJSON } from "../../utils/readJSON";
+import { readJSON } from "@/utils/readJSON";
 import { existsSync, readdirSync, rmSync } from "node:fs";
-import { parseConfigId } from "../../utils/parseConfigId";
+import { parseConfigId } from "@/utils/parseConfigId";
 
 class Cleanup {
   private readonly logger!: Logger;

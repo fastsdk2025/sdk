@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { ConfigId } from "../../types/xyx";
+import { ConfigId } from "@/types/xyx";
 import { CleanOptions } from "./types";
 import Cleanup from "./Cleanup";
 
