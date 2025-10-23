@@ -1,14 +1,44 @@
-import { exec, execSync } from "node:child_process";
-import os from "node:os";
+import { execSync } from "node:child_process";
+import { isCommandAvailable } from "./isCommandAvailable";
 
 export function copy(content: string): void {
-  const platform = os.platform();
-
-  if (platform === "win32") {
-    execSync(`echo "${content}" | clip`);
-  } else if (platform === "darwin") {
-    execSync(`echo "${content}" | pbcopy`);
-  } else {
-    exec(`echo "${content}" | xclip -selection clipboard`);
+  switch (process.platform) {
+    case "win32":
+      if (isCommandAvailable("clip")) {
+        execSync(`echo "${content}" | clip`);
+      } else {
+        throw new Error(
+          // `Unable to execute command: clip. Please check whether the command is registered in the system environment variables.`,
+          `❌ Command "clip" not found. Make sure it’s available in your system PATH.`,
+        );
+      }
+      break;
+    case "darwin":
+      if (isCommandAvailable("pbcopy")) {
+        execSync(`echo "${content}" | pbcopy`);
+      } else {
+        throw new Error(
+          // `Unable to execute command: pbcopy. Please check whether the command is registered in the system environment variables.`,
+          `❌ Command "pbcopy" not found. Make sure it’s available in your system PATH.`,
+          {
+            cause: new Error("Command not found"),
+          },
+        );
+      }
+      break;
+    default:
+      if (isCommandAvailable("xclip")) {
+        execSync(`echo "${content}" | xclip -selection clipboard`);
+      } else if (isCommandAvailable("xsel")) {
+        execSync(`echo "${content}" | xsel -b`);
+      } else {
+        throw new Error(
+          // `Unable to execute command: xclip. Please check whether the command is registered in the system environment variables.`,
+          `❌ Command "xclip" not found. Make sure it’s available in your system PATH.`,
+          {
+            cause: new Error("Command not found"),
+          },
+        );
+      }
   }
 }
