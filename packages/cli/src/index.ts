@@ -1,11 +1,11 @@
-import { Command } from "commander";
 import { version } from "../package.json";
 import cleanCommand from "@commands/clean";
 import resultCommand from "@commands/result";
 import uploadCommand from "@commands/upload";
+import Kernel from "@core/Kernel";
 
 async function main() {
-  const program = new Command();
+  const program = new Kernel();
 
   program
     .name("fast")
