@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 
-function isCommandAvailable(command: string): boolean {
+export function isCommandAvailable(command: string): boolean {
   let cmdName: string;
   let args: string[];
 
