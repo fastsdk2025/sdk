@@ -37,7 +37,7 @@ class Cleanup {
     return templatePath;
   }
 
-  public async clean(configId: string): Promise<void> {
+  public async clean(configId: ConfigId): Promise<void> {
     this.logger.info("Project cleanup started for config ID:", configId);
 
     // 获取项目根目录
