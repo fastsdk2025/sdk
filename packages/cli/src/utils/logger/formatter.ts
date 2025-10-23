@@ -1,4 +1,4 @@
-import { addPrefixZero } from "@/utils/addPrefixZero";
+import { addPrefixZero } from "@utils/addPrefixZero";
 
 export function formatDate(date: Date, format: string = "YYYY-MM-DD HH:mm:ss") {
   const year = date.getFullYear();

@@ -1,6 +1,6 @@
 import OSS, { type Options } from "ali-oss";
-import { ConfigManager } from "@/utils/config/ConfigManager";
-import { createLogger } from "@/utils/logger";
+import { ConfigManager } from "@utils/config/ConfigManager";
+import { createLogger } from "@utils/logger";
 import { basename } from "node:path";
 import { stat } from "node:fs/promises";
 

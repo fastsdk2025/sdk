@@ -1,16 +1,16 @@
 import { dirname, join } from "node:path";
 import { ConfigId, PlatformConfig } from "@/types/xyx";
-import { getWorkerDir } from "@/utils/getWorkerDir";
-import { getXYXConfig } from "@/utils/getXYXConfig";
-import Logger from "@/utils/logger/Logger";
-import { LogLevelLiteral } from "@/utils/logger/types";
-import { parseConfigId } from "@/utils/parseConfigId";
+import { getWorkerDir } from "@utils/getWorkerDir";
+import { getXYXConfig } from "@utils/getXYXConfig";
+import Logger from "@utils/logger/Logger";
+import { LogLevelLiteral } from "@utils/logger/types";
+import { parseConfigId } from "@utils/parseConfigId";
 import { LinksResult, RenderCtx, ResultOptions } from "./types";
 import { template } from "./template";
-import { normalizeName } from "@/utils/normalizeName";
-import { copy } from "@/utils/copy";
-import { openEditorAndRead } from "@/utils/openEditorAndRead";
-import { uploader } from "@/commands/upload/uploader";
+import { normalizeName } from "@utils/normalizeName";
+import { copy } from "@utils/copy";
+import { openEditorAndRead } from "@utils/openEditorAndRead";
+import { uploader } from "@commands/upload/uploader";
 import { readdir } from "node:fs/promises";
 
 export class ResultManager {

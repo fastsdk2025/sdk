@@ -1,4 +1,4 @@
-import { LogLevelLiteral } from "@/utils/logger/types";
+import { LogLevelLiteral } from "@utils/logger/types";
 
 export interface ResultOptions {
   logLevel: LogLevelLiteral;
