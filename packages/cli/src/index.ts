@@ -1,7 +1,7 @@
 import { version } from "../package.json";
-import cleanCommand from "@commands/clean";
-import resultCommand from "@commands/result";
-import uploadCommand from "@commands/upload";
+import CleanCommand from "@commands/clean";
+import ResultCommand from "@commands/result";
+import UploadCommand from "@commands/upload";
 import Kernel from "@core/Kernel";
 
 async function main() {
@@ -13,9 +13,9 @@ async function main() {
     .description("A high-performance CLI for fast development")
     .version(version, "-V, --version");
 
-  program.addCommand(cleanCommand);
-  program.addCommand(resultCommand);
-  program.addCommand(uploadCommand);
+  program.registerCommand(CleanCommand)
+  program.registerCommand(ResultCommand)
+  program.registerCommand(UploadCommand)
 
   if (process.argv.slice(2).length === 0) {
     program.outputHelp();

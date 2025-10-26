@@ -1,19 +1,19 @@
-import { Command } from "commander";
 import { ConfigId } from "@/types/xyx";
 import { ResultOptions } from "./types";
 import { ResultManager } from "./ResultManager";
+import CommandBase from "@/core/CommandBase";
 
-const resultCommand = new Command();
-
-resultCommand
-  .name("result")
-  .description("显示<configId>平台构建后发布结果")
-  .argument("<configId>", "平台配置ID")
-  .option("--log-level <level>", "日志级别", "info")
-  .option("-m, --message [message]", "更新日志")
-  .action(async (configId: ConfigId, options: ResultOptions) => {
-    const result = new ResultManager(configId, options);
-    await result.show();
-  });
-
-export default resultCommand;
+export default class ResultCommand extends CommandBase {
+  onEnable(): void {
+    this.program
+      .name("result")
+      .description("显示<configId>平台构建后发布结果")
+      .argument("<configId>", "平台配置ID")
+      .option("--log-level <level>", "日志级别", "info")
+      .option("-m, --message [message]", "更新日志")
+      .action(async (configId: ConfigId, options: ResultOptions) => {
+        const result = new ResultManager(configId, options);
+        await result.show();
+      });
+  }
+}
