@@ -14,10 +14,8 @@ export default class Kernel extends Command {
   }
 
   public async boot() {
-    this.serviceManager.defineMultiple({
-      logger: LoggerService,
-      config: ConfigService
-    })
+    this.serviceManager.define("logger", LoggerService)
+    this.serviceManager.define("config", ConfigService)
 
     await this.serviceManager.initAll()
   }
