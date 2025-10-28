@@ -13,9 +13,9 @@ async function main() {
     .description("A high-performance CLI for fast development")
     .version(version, "-V, --version");
 
-  program.registerCommand(CleanCommand)
-  program.registerCommand(ResultCommand)
-  program.registerCommand(UploadCommand)
+  program.registerCommand(CleanCommand);
+  program.registerCommand(ResultCommand);
+  program.registerCommand(UploadCommand);
 
   if (process.argv.slice(2).length === 0) {
     program.outputHelp();
