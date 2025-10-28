@@ -1,8 +1,7 @@
 import { Command } from "commander";
 import ServiceManager from "./ServiceManager";
-import LoggerService from "./services/logger/LoggerService";
-import ConfigService from "./services/config/ConfigService";
 import { CommandConstructor } from "./types";
+import { serviceDefinitions } from "./services/registry";
 
 export default class Kernel extends Command {
   public readonly serviceManager!: ServiceManager;
@@ -14,8 +13,7 @@ export default class Kernel extends Command {
   }
 
   public async boot() {
-    this.serviceManager.define("logger", LoggerService)
-    this.serviceManager.define("config", ConfigService)
+    this.serviceManager.defineMultiple(serviceDefinitions)
 
     await this.serviceManager.initAll()
   }
