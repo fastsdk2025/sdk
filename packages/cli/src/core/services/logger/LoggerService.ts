@@ -6,17 +6,12 @@ import { formatDate } from "@/utils/formatDate";
 
 export default class LoggerService extends Service {
   private logLevel: LogLevelLiteral = "info";
-  private context?: string;
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
     if (level === "silent") return
     if (LogLevel[level].priority < LogLevel[this.logLevel].priority) return
 
     const line: unknown[] = [this.getDate(), LogLevel[level].level()];
-
-    if (this.context) {
-      line.push(chalk.gray(`[${this.context}]`))
-    }
 
     if (typeof args[0] === "string") {
       line.push(LogLevel[level].color(args[0]))
@@ -34,10 +29,6 @@ export default class LoggerService extends Service {
 
   public setLevel(logLevel: LogLevelLiteral) {
     this.logLevel = logLevel
-  }
-
-  public setContext(context: string) {
-    this.context = context
   }
 
   public info(...args: unknown[]) {
