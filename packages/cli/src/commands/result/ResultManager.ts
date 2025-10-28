@@ -80,14 +80,24 @@ export class ResultManager {
     const hostname = publisher ? `${publisher}game` : "hnyigegame";
     const host = `http://twww.${hostname}.com/h5games/${hostname}`;
 
-    const url = new URL(online_url);
+    const game_url = new URL(online_url);
 
-    const cyProjectName = dirname(url.pathname).replace(/^\//, "");
+    const cyProjectName = dirname(game_url.pathname).replace(/^\//, "");
+
+    const advertising_link = new URL(
+      `${join(cyProjectName, "index.html")}`,
+      host,
+    );
+
+    advertising_link.searchParams.append("env", "pre");
+    const official_advertising_link = advertising_link.href;
+    advertising_link.searchParams.append("ad_env", "preview");
+    const test_advertising_link = advertising_link.href;
 
     return {
-      official_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre`,
-      test_advertising_link: `${join(host, cyProjectName, "index.html")}?env=pre&ad_env=preview`,
-      game_url: url.href,
+      official_advertising_link,
+      test_advertising_link,
+      game_url: game_url.href,
       cyProjectName,
     };
   }
