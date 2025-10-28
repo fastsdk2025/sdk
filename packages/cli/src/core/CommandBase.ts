@@ -4,7 +4,7 @@ import Kernel from "./Kernel";
 export default abstract class CommandBase {
   public readonly program: Command = new Command();
   constructor(
-    private kernel: Kernel
+    protected kernel: Kernel
   ) {
     this.onEnable()
   }
