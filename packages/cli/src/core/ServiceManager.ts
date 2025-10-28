@@ -1,18 +1,19 @@
 import Kernel from "./Kernel";
-import { ServiceName, ServiceInstance, ServiceConstructor, ServiceContext } from "./types";
+import { ServiceName, ServiceConstructor } from "./services/registry"
+import { ServiceInstance, ServiceContext } from "./types";
 
 export default class ServiceManager {
   private readonly services: Map<ServiceName, ServiceInstance> = new Map();
-  private readonly definitions: Map<ServiceName, ServiceConstructor<ServiceName>> = new Map()
+  private readonly definitions: Map<ServiceName, ServiceConstructor> = new Map()
   private initialized: boolean = false;
 
   constructor(protected kernel: Kernel) { }
 
-  public define<K extends ServiceName, T extends ServiceConstructor<K>>(name: K, ctor: T): void {
+  public define<K extends ServiceName, T extends ServiceConstructor>(name: K, ctor: T): void {
     this.definitions.set(name, ctor)
   }
 
-  public defineMultiple<K extends ServiceName, T extends ServiceConstructor<K>>(services: Record<K, T>) {
+  public defineMultiple<K extends ServiceName, T extends ServiceConstructor>(services: Record<K, T>) {
     for (const [name, ctor] of Object.entries(services) as Array<[K, T]>) {
       this.define(name, ctor)
     }
@@ -25,7 +26,7 @@ export default class ServiceManager {
 
     const definition = this.definitions.get(name)
     if (definition) {
-      return this.instantiate<K, T>(name, definition as ServiceConstructor<K>)
+      return this.instantiate<K, T>(name, definition as ServiceConstructor)
     }
 
     return undefined
@@ -39,7 +40,7 @@ export default class ServiceManager {
     return service as T
   }
 
-  public instantiate<K extends ServiceName, T extends ServiceInstance>(name: K, Ctor: ServiceConstructor<K>): T {
+  public instantiate<K extends ServiceName, T extends ServiceInstance>(name: K, Ctor: ServiceConstructor): T {
     if (this.services.has(name)) {
       return this.services.get(name) as T
     }

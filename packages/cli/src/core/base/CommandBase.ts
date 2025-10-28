@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import Kernel from "../Kernel";
-import { ServiceInstance, ServiceName } from "../types";
+import { ServiceName } from "@core/services/registry"
+import { ServiceInstance } from "../types";
 
 export default abstract class CommandBase {
   public readonly program: Command = new Command();

@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import ServiceManager from "./ServiceManager";
 import LoggerService from "./services/logger/LoggerService";
-import CommandBase from "./base/CommandBase";
 import ConfigService from "./services/config/ConfigService";
 import { CommandConstructor } from "./types";
 

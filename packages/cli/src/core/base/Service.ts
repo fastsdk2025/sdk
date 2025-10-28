@@ -1,4 +1,5 @@
-import { ServiceContext, ServiceInstance, ServiceName } from "../types";
+import { ServiceName } from "@core/services/registry"
+import { ServiceContext, ServiceInstance } from "@core/types";
 
 export default abstract class Service {
   constructor(protected context: ServiceContext) { }
