@@ -1,16 +1,16 @@
 import { IConfig } from "./types";
 import Service from "@core/base/Service";
-import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import { ensureDir } from "@utils/ensureDir";
 import { readJSON } from "@utils/readJSON";
 import { writeJSON } from "@utils/writeJSON";
 import LoggerService from "../logger/LoggerService";
+import { CONFIG } from "@core/constants";
 
 export default class ConfigService extends Service {
-  private static readonly CONFIG_DIR: string = join(homedir(), ".fast")
-  private static readonly CONFIG_FILE: string = join(ConfigService.CONFIG_DIR, "config.json")
-  private static readonly DEBOUNCE_DELAY = 100;
+  private static readonly CONFIG_DIR: string = CONFIG.DIR;
+  private static readonly CONFIG_FILE: string = CONFIG.FILE;
+  private static readonly DEBOUNCE_DELAY = CONFIG.DEBOUNCE_DELAY;
 
   private data!: IConfig;
   private saveTimeout: NodeJS.Timeout | null = null

@@ -3,9 +3,10 @@ import { LogLevelLiteral } from "./types";
 import { LogLevel } from "./levels";
 import chalk from "chalk";
 import { formatDate } from "@/utils/formatDate";
+import { LOGGER } from "@/core/constants";
 
 export default class LoggerService extends Service {
-  private logLevel: LogLevelLiteral = "info";
+  private logLevel: LogLevelLiteral = LOGGER.DEFAULT_LEVEL;
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
     if (level === "silent") return
@@ -24,7 +25,7 @@ export default class LoggerService extends Service {
   }
 
   private getDate() {
-    return chalk.dim.gray(`[${formatDate(new Date())}]`)
+    return chalk.dim.gray(`[${formatDate(new Date(), LOGGER.DATE_FORMAT)}]`)
   }
 
   public setLevel(logLevel: LogLevelLiteral) {
