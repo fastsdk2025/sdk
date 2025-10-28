@@ -27,11 +27,23 @@ export default class ConfigService extends Service {
     ensureDir(dirname(ConfigService.CONFIG_FILE))
     try {
       this.data = readJSON<IConfig>(ConfigService.CONFIG_FILE)
-    } catch {
-      this.data = {
-        cloud: {}
-      } as IConfig;
-      this.requestSave()
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        this.data = this.getDefaultConfig()
+        this.requestSave()
+      } else if (error instanceof SyntaxError) {
+        console.error("Config file corrupted, creating backup...")
+        this.data = this.getDefaultConfig()
+        this.requestSave()
+      } else {
+        throw new Error(`Failed to load config: ${error}`, { cause: error })
+      }
+    }
+  }
+
+  private getDefaultConfig(): IConfig {
+    return {
+      cloud: {}
     }
   }
 
