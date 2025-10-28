@@ -13,9 +13,13 @@ export default class Kernel extends Command {
     this.serviceManager = new ServiceManager(this)
   }
 
-  public boot() {
-    this.serviceManager.register("logger", LoggerService)
-    this.serviceManager.register("config", ConfigService)
+  public async boot() {
+    this.serviceManager.defineMultiple({
+      logger: LoggerService,
+      config: ConfigService
+    })
+
+    await this.serviceManager.initAll()
   }
 
   public registerCommand(commandClass: new (kernel: Kernel) => CommandBase) {
