@@ -15,12 +15,13 @@ export default class ConfigService extends Service {
   private data!: IConfig;
   private saveTimeout: NodeJS.Timeout | null = null
 
-  constructor(protected kernel: Kernel) {
-    super(kernel)
-
+  public onRegister(): void {
     this.loadConfig()
-
     process.on("exit", this.flush.bind(this))
+  }
+
+  public onDestroy(): void {
+    this.flush()
   }
 
   public loadConfig(): void {
