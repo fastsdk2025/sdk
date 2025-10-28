@@ -44,7 +44,7 @@ class Cleanup {
     const projectBase = getWorkerDir(process.cwd(), "xyx.config.json");
     if (!projectBase) {
       this.logger.error(
-        `Could not find xxy.config.json in ${process.cwd()} or any parent directory`,
+        `Could not find xyx.config.json in ${process.cwd()} or any parent directory`,
       );
       process.exit(1);
     }
