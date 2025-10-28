@@ -13,6 +13,8 @@ async function main() {
     .description("A high-performance CLI for fast development")
     .version(version, "-V, --version");
 
+  await program.boot()
+
   program.registerCommand(CleanCommand);
   program.registerCommand(ResultCommand);
   program.registerCommand(UploadCommand);
