@@ -1,3 +1,4 @@
+import CommandBase from "./base/CommandBase";
 import Kernel from "./Kernel";
 import ConfigService from "./services/config/ConfigService";
 import LoggerService from "./services/logger/LoggerService";
@@ -19,4 +20,8 @@ export interface ServiceContext {
 export interface ServiceConstructor<K extends ServiceName> {
   new(context: ServiceContext): ServiceRegistry[K];
   dependencies?: string[];
+}
+
+export interface CommandConstructor {
+  new(kernel: Kernel): CommandBase;
 }

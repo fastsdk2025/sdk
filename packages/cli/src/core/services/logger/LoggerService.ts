@@ -1,4 +1,4 @@
-import Service from "@core/Service";
+import Service from "@core/base/Service";
 import { LogLevelLiteral } from "./types";
 import { LogLevel } from "./levels";
 import chalk from "chalk";

@@ -1,4 +1,4 @@
-import { ServiceContext, ServiceInstance, ServiceName } from "./types";
+import { ServiceContext, ServiceInstance, ServiceName } from "../types";
 
 export default abstract class Service {
   constructor(protected context: ServiceContext) { }

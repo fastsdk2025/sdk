@@ -1,7 +1,7 @@
 import { ConfigId } from "@/types/xyx";
 import { ResultOptions } from "./types";
 import { ResultManager } from "./ResultManager";
-import CommandBase from "@/core/CommandBase";
+import CommandBase from "@core/base/CommandBase";
 
 export default class ResultCommand extends CommandBase {
   onEnable(): void {

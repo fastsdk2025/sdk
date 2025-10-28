@@ -1,7 +1,6 @@
-import { Command } from "commander";
 import { uploader } from "./uploader";
 import { createLogger } from "@utils/logger";
-import CommandBase from "@/core/CommandBase";
+import CommandBase from "@core/base/CommandBase";
 
 const logger = createLogger("info", "UploadCommand");
 

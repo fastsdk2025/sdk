@@ -1,5 +1,5 @@
 import { IConfig } from "./types";
-import Service from "@core/Service";
+import Service from "@core/base/Service";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { ensureDir } from "@utils/ensureDir";

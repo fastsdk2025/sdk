@@ -1,8 +1,9 @@
 import { Command } from "commander";
 import ServiceManager from "./ServiceManager";
 import LoggerService from "./services/logger/LoggerService";
-import CommandBase from "./CommandBase";
+import CommandBase from "./base/CommandBase";
 import ConfigService from "./services/config/ConfigService";
+import { CommandConstructor } from "./types";
 
 export default class Kernel extends Command {
   public readonly serviceManager!: ServiceManager;
@@ -20,7 +21,7 @@ export default class Kernel extends Command {
     await this.serviceManager.initAll()
   }
 
-  public registerCommand(commandClass: new (kernel: Kernel) => CommandBase) {
+  public registerCommand(commandClass: CommandConstructor) {
     const command = new commandClass(this)
     this.addCommand(command.program)
   }
