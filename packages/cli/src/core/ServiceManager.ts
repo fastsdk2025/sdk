@@ -1,69 +1,62 @@
 import Kernel from "./Kernel";
-import Service from "./Service";
-import { ServiceConstructor, ServiceContext } from "./types";
+import { ServiceName, ServiceInstance, ServiceConstructor, ServiceContext } from "./types";
 
 export default class ServiceManager {
-  private readonly services: Map<string, Service> = new Map();
-  private readonly definitions: Map<string, ServiceConstructor> = new Map();
+  private readonly services: Map<ServiceName, ServiceInstance> = new Map();
+  private readonly definitions: Map<ServiceName, ServiceConstructor<ServiceName>> = new Map()
   private initialized: boolean = false;
 
-  constructor(private kernel: Kernel) {}
+  constructor(protected kernel: Kernel) { }
 
-  public define(name: string, serviceClass: ServiceConstructor): void {
-    this.definitions.set(name, serviceClass)
+  public define<K extends ServiceName, T extends ServiceConstructor<K>>(name: K, ctor: T): void {
+    this.definitions.set(name, ctor)
   }
 
-  public defineMultiple(services: Record<string, ServiceConstructor>): void {
-    for (const [name, serviceClass] of Object.entries(services)) {
-      this.define(name, serviceClass)
+  public defineMultiple<K extends ServiceName, T extends ServiceConstructor<K>>(services: Record<K, T>) {
+    for (const [name, ctor] of Object.entries(services) as Array<[K, T]>) {
+      this.define(name, ctor)
     }
   }
 
-  public get<T extends Service>(name: string): T | undefined {
+  public get<K extends ServiceName, T extends ServiceInstance>(name: K): T | undefined {
     if (this.services.has(name)) {
       return this.services.get(name) as T
     }
 
     const definition = this.definitions.get(name)
     if (definition) {
-      return this.instantiate<T>(name, definition)
+      return this.instantiate<K, T>(name, definition as ServiceConstructor<K>)
     }
 
     return undefined
   }
 
-  public require<T extends Service>(name: string) {
-    const service = this.get<T>(name)
-
+  public require<K extends ServiceName, T extends ServiceInstance>(name: K): T {
+    const service = this.get<K, T>(name)
     if (!service) {
       throw new Error(`Service "${name}" not found or not registered`)
     }
-
-    return service
+    return service as T
   }
 
-  private instantiate<T extends Service>(name: string, serviceClass: ServiceConstructor): T {
+  public instantiate<K extends ServiceName, T extends ServiceInstance>(name: K, Ctor: ServiceConstructor<K>): T {
     if (this.services.has(name)) {
       return this.services.get(name) as T
     }
 
-    const context: ServiceContext = {
-      kernel: this.kernel,
-      getService: (name: string) => this.get(name),
-      requireService: (name: string) => this.require(name)
-    }
+    const context = this.createContext()
 
-    const placeholder = {} as T
+    const placeholder = {} as T;
     this.services.set(name, placeholder);
 
     try {
-      const instance = new serviceClass(context)
+      const instance = new Ctor(context)
       this.services.set(name, instance)
 
       instance.onRegister?.();
 
       if (this.initialized) {
-        instance.onInit?.();
+        instance.onInit?.()
       }
 
       return instance as T
@@ -73,19 +66,32 @@ export default class ServiceManager {
     }
   }
 
-  public async initAll(): Promise<void> {
+  private createContext(): ServiceContext {
+    const that = this;
+    return {
+      kernel: this.kernel,
+      getService<K extends ServiceName, T extends ServiceInstance>(name: K): T | undefined {
+        return that.get(name)
+      },
+      requireService<K extends ServiceName, T extends ServiceInstance>(name: K): T {
+        return that.require(name)
+      }
+    }
+  }
+
+  public async initAll() {
     for (const name of this.definitions.keys()) {
       this.get(name)
     }
 
     for (const service of this.services.values()) {
-      await service.onInit?.();
+      await service.onInit?.()
     }
 
-    this.initialized = true;
+    this.initialized = true
   }
 
-  public destroy(name: string): void {
+  public destroy<K extends ServiceName>(name: K) {
     const instance = this.services.get(name)
     if (instance) {
       instance.onDestroy?.()
@@ -93,7 +99,7 @@ export default class ServiceManager {
     }
   }
 
-  public async destroyAll(): Promise<void> {
+  public async destroyAll() {
     for (const service of this.services.values()) {
       await service.onDestroy?.();
     }
@@ -101,8 +107,8 @@ export default class ServiceManager {
     this.services.clear()
   }
 
-  public has(name: string): boolean {
-    return this.services.has(name) || this.definitions.has(name)
+  public has<K extends ServiceName>(name: K) {
+    return this.services.has(name) || this.definitions.get(name)
   }
 
   public getNames(): string[] {

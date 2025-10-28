@@ -17,7 +17,7 @@ export default class ConfigService extends Service {
   private logger!: LoggerService
 
   public onRegister(): void {
-    this.logger = this.requireService<LoggerService>("logger")
+    this.logger = this.requireService("logger")
     this.loadConfig()
     process.on("exit", this.flush.bind(this))
   }

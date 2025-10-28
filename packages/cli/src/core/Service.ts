@@ -1,13 +1,13 @@
-import { ServiceContext } from "./types";
+import { ServiceContext, ServiceInstance, ServiceName } from "./types";
 
 export default abstract class Service {
   constructor(protected context: ServiceContext) { }
 
-  protected getService<T extends Service>(name: string): T | undefined {
-    return this.context.getService<T>(name)
+  protected getService<K extends ServiceName, T extends ServiceInstance<K>>(name: K): T | undefined {
+    return this.context.getService<K, T>(name)
   }
-  protected requireService<T extends Service>(name: string): T {
-    return this.context.requireService<T>(name)
+  protected requireService<K extends ServiceName, T extends ServiceInstance<K>>(name: K): T {
+    return this.context.requireService<K, T>(name)
   }
 
   public onRegister?(): void;
