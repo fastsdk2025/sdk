@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { ensureDir } from "@utils/ensureDir";
 import { readJSON } from "@utils/readJSON";
 import { writeJSON } from "@utils/writeJSON";
+import LoggerService from "../logger/LoggerService";
 
 export default class ConfigService extends Service {
   private static readonly CONFIG_DIR: string = join(homedir(), ".fast")
@@ -13,13 +14,15 @@ export default class ConfigService extends Service {
 
   private data!: IConfig;
   private saveTimeout: NodeJS.Timeout | null = null
+  private logger!: LoggerService
 
   public onRegister(): void {
+    this.logger = this.requireService<LoggerService>("logger")
     this.loadConfig()
     process.on("exit", this.flush.bind(this))
   }
 
-  public onDestroy(): void {
+  public async onDestroy(): Promise<void> {
     this.flush()
   }
 
@@ -32,7 +35,7 @@ export default class ConfigService extends Service {
         this.data = this.getDefaultConfig()
         this.requestSave()
       } else if (error instanceof SyntaxError) {
-        console.error("Config file corrupted, creating backup...")
+        this.logger.error("Config file corrupted, creating backup...")
         this.data = this.getDefaultConfig()
         this.requestSave()
       } else {
