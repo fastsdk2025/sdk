@@ -1,8 +1,7 @@
-import { IConfig } from "@utils/config/types";
+import { IConfig } from "./types";
 import Service from "@core/Service";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import Kernel from "@core/Kernel";
 import { ensureDir } from "@utils/ensureDir";
 import { readJSON } from "@utils/readJSON";
 import { writeJSON } from "@utils/writeJSON";
