@@ -15,27 +15,42 @@ export default class ConfigService extends Service {
   private data!: IConfig;
   private saveTimeout: NodeJS.Timeout | null = null;
   private logger!: LoggerService;
+  private exitHandler!: () => void;
 
   public onRegister(): void {
     this.logger = this.requireService("logger");
     this.loadConfig();
-    process.on("exit", this.flush.bind(this));
+    this.exitHandler = this.flush.bind(this);
+    process.on("exit", this.exitHandler);
   }
 
   public async onDestroy(): Promise<void> {
+    process.off("exit", this.exitHandler);
     this.flush();
   }
 
   public loadConfig(): void {
-    ensureDir(dirname(ConfigService.CONFIG_FILE));
+    try {
+      ensureDir(dirname(ConfigService.CONFIG_FILE));
+    } catch (error) {
+      throw new Error(
+        `Failed to create config directory: ${(error as Error).message}`,
+        {
+          cause: error,
+        },
+      );
+    }
+
     try {
       this.data = readJSON<IConfig>(ConfigService.CONFIG_FILE);
+      this.logger.debug(`Config loaded from ${ConfigService.CONFIG_FILE}`);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        this.logger.debug("Config file not found, creating default config");
         this.data = this.getDefaultConfig();
         this.requestSave();
       } else if (error instanceof SyntaxError) {
-        this.logger.error("Config file corrupted, creating backup...");
+        this.logger.warn("Config file corrupted, using default config");
         this.data = this.getDefaultConfig();
         this.requestSave();
       } else {
@@ -51,7 +66,13 @@ export default class ConfigService extends Service {
   }
 
   public save(): void {
-    writeJSON(ConfigService.CONFIG_FILE, this.data);
+    try {
+      writeJSON(ConfigService.CONFIG_FILE, this.data);
+      this.logger.debug(`Config saved to ${ConfigService.CONFIG_FILE}`);
+    } catch (error) {
+      this.logger.error(`Failed to save config: ${(error as Error).message}`);
+      throw error;
+    }
   }
 
   private requestSave(): void {
@@ -60,7 +81,11 @@ export default class ConfigService extends Service {
     }
 
     this.saveTimeout = setTimeout(() => {
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        this.logger.error(`Auto-save failed: `, error);
+      }
       this.saveTimeout = null;
     }, ConfigService.DEBOUNCE_DELAY);
   }
@@ -68,9 +93,14 @@ export default class ConfigService extends Service {
   public flush(): void {
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
+      this.saveTimeout = null;
     }
 
-    this.save();
+    try {
+      this.save();
+    } catch (error) {
+      console.error("Failed to flush config: ", error);
+    }
   }
 
   public get<K extends keyof IConfig>(key: K): IConfig[K] {
@@ -89,5 +119,14 @@ export default class ConfigService extends Service {
 
   public has<K extends keyof IConfig>(key: K): boolean {
     return key in this.data;
+  }
+
+  public getAll(): Readonly<IConfig> {
+    return { ...this.data };
+  }
+
+  public reset(): void {
+    this.data = this.getDefaultConfig();
+    this.requestSave();
   }
 }
