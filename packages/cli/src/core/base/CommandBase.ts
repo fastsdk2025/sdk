@@ -1,22 +1,22 @@
 import { Command } from "commander";
 import Kernel from "../Kernel";
-import { ServiceName } from "@core/services/registry"
+import { ServiceName } from "@core/services/registry";
 import { ServiceInstance } from "../types";
 
 export default abstract class CommandBase {
   public readonly program: Command = new Command();
-  constructor(
-    protected kernel: Kernel
-  ) {
-    this.onEnable()
+  constructor(protected kernel: Kernel) {
+    this.onEnable();
   }
 
-  protected getService<K extends ServiceName>(name: K): ServiceInstance<K> | undefined {
-    return this.kernel.serviceManager.get(name)
+  public getService<K extends ServiceName>(
+    name: K,
+  ): ServiceInstance<K> | undefined {
+    return this.kernel.serviceManager.get(name);
   }
 
-  protected requireService<K extends ServiceName>(name: K): ServiceInstance<K> {
-    return this.kernel.serviceManager.require(name)
+  public requireService<K extends ServiceName>(name: K): ServiceInstance<K> {
+    return this.kernel.serviceManager.require(name);
   }
 
   abstract onEnable(): void;

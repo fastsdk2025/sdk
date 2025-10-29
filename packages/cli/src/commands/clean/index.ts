@@ -11,7 +11,7 @@ export default class CleanCommand extends CommandBase {
       .argument("<configId>", "平台配置ID")
       .option("--log-level", "指定日志等级", "info")
       .action(async (configId: ConfigId, options: CleanOptions) => {
-        const cleanup = new Cleanup(options);
+        const cleanup = new Cleanup(this, options);
 
         await cleanup.clean(configId);
       });

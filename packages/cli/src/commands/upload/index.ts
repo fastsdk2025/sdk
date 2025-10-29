@@ -1,8 +1,5 @@
-import { uploader } from "./uploader";
 import { createLogger } from "@utils/logger";
 import CommandBase from "@core/base/CommandBase";
-
-const logger = createLogger("info", "UploadCommand");
 
 export default class UploadCommand extends CommandBase {
   onEnable(): void {
@@ -15,13 +12,9 @@ export default class UploadCommand extends CommandBase {
         "Destination object name in the bucket (defaults to basename)",
       )
       .action(async (file: string, options: { dest?: string }) => {
-        try {
-          const url = await uploader(file, options.dest);
-          logger.info("Upload succeeded: ", url);
-        } catch (error) {
-          logger.error((error as Error).message);
-          process.exit(1);
-        }
+        const upload = this.requireService("upload");
+
+        upload.uploadFile(file, options.dest);
       });
   }
 }

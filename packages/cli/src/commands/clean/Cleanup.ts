@@ -7,13 +7,20 @@ import { homedir } from "node:os";
 import { readJSON } from "@utils/readJSON";
 import { existsSync, readdirSync, rmSync } from "node:fs";
 import { parseConfigId } from "@utils/parseConfigId";
+import LoggerService from "@/core/services/logger/LoggerService";
+import CommandBase from "@/core/base/CommandBase";
 
 class Cleanup {
-  private readonly logger!: Logger;
+  private readonly logger!: LoggerService;
   private templatePath!: string;
 
-  constructor(options: CleanOptions) {
-    this.logger = Logger.createLogger(options.logLevel, "Cleanup");
+  constructor(
+    private readonly app: CommandBase,
+    options: CleanOptions,
+  ) {
+    const { logLevel = "info" } = options;
+    this.logger = this.app.requireService("logger");
+    this.logger.setLevel(logLevel);
   }
 
   private getTemplatePath() {

@@ -12,7 +12,7 @@ export default class ResultCommand extends CommandBase {
       .option("--log-level <level>", "日志级别", "info")
       .option("-m, --message [message]", "更新日志")
       .action(async (configId: ConfigId, options: ResultOptions) => {
-        const result = new ResultManager(configId, options);
+        const result = new ResultManager(this, configId, options);
         await result.show();
       });
   }

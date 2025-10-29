@@ -10,18 +10,22 @@ import { template } from "./template";
 import { normalizeName } from "@utils/normalizeName";
 import { copy } from "@utils/copy";
 import { openEditorAndRead } from "@utils/openEditorAndRead";
-import { uploader } from "@commands/upload/uploader";
 import { readdir } from "node:fs/promises";
+import CommandBase from "@core/base/CommandBase";
+import LoggerService from "@core/services/logger/LoggerService";
+import UploadService from "@core/services/upload/UploadService";
 
 export class ResultManager {
   private readonly logLevel!: LogLevelLiteral;
   private readonly message!: string | boolean;
-  private readonly logger!: Logger;
+  private readonly logger!: LoggerService;
+  private readonly upload!: UploadService;
 
   private readonly remotePrefix = "heigame/hippoo";
   private templateStr: string = template;
 
   constructor(
+    private readonly app: CommandBase,
     private readonly configId: ConfigId,
     private readonly options: ResultOptions,
   ) {
@@ -30,7 +34,9 @@ export class ResultManager {
     this.logLevel = logLevel;
     this.message = message;
 
-    this.logger = Logger.createLogger(this.logLevel, "ResultManager");
+    this.logger = this.app.requireService("logger");
+    this.logger.setLevel(logLevel);
+    this.upload = this.app.requireService("upload");
   }
 
   private async uploadZip(
@@ -63,7 +69,7 @@ export class ResultManager {
       this.logger.debug("Local Path: ", localPath);
       this.logger.debug("Remote Path: ", remotePath);
 
-      const resultUrl = await uploader(localPath, remotePath);
+      const resultUrl = await this.upload.uploadFile(localPath, remotePath);
       this.logger.info(`Uploaded to ${resultUrl}`);
 
       return resultUrl;
