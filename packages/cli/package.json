@@ -15,6 +15,17 @@
   "keywords": [
     "CLI"
   ],
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fastsdk2025/sdk.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "author": "tuiu <13719283454@163.com>",
   "license": "MIT",
   "packageManager": "pnpm@10.17.1"
