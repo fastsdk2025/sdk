@@ -7,6 +7,7 @@ import { LOGGER } from "@/core/constants";
 
 export default class LoggerService extends Service {
   private logLevel: LogLevelLiteral = LOGGER.DEFAULT_LEVEL;
+  private output: typeof console.log = console.log;
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
     if (level === "silent") return;
@@ -21,7 +22,7 @@ export default class LoggerService extends Service {
       line.push(...args);
     }
 
-    console.log(...line);
+    this.output(...line);
   }
 
   private getDate() {
@@ -29,7 +30,14 @@ export default class LoggerService extends Service {
   }
 
   public setLevel(logLevel: LogLevelLiteral) {
+    if (!LogLevel[logLevel]) {
+      throw new Error(`Invalid log level: ${logLevel}`);
+    }
     this.logLevel = logLevel;
+  }
+
+  public setOutput(output: typeof console.log): void {
+    this.output = output;
   }
 
   public info(...args: unknown[]) {
