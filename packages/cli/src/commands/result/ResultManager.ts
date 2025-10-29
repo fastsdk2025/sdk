@@ -84,7 +84,7 @@ export class ResultManager {
     const { publisher } = parseConfigId(configId);
 
     const hostname = publisher ? `${publisher}game` : "hnyigegame";
-    const host = `http://twww.${hostname}.com/h5games/${hostname}`;
+    const host = `http://twww.${hostname}.com/h5games/${hostname}/`;
 
     const game_url = new URL(online_url);
 
