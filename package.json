@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "A high-performance CLI for fast development",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "cli:dev": "pnpm --filter @fastsdk2025/cli run dev",
+    "cli:watch": "pnpm --filter @fastsdk2025/cli run watch",
+    "cli:build": "pnpm --filter @fastsdk2025/cli run build"
+  },
   "keywords": [
     "Fast",
     "Development",
