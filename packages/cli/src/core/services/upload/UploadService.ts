@@ -101,8 +101,28 @@ export default class UploadService extends Service {
         );
 
         const result = await this.client.put(objectName, file);
-      } catch (error) {}
+        const url = this.buildResultUrl(result, objectName);
+
+        this.logger.info("Upload succeeded: ", url);
+        return url;
+      } catch (error) {
+        lastError = error;
+        this.logger.debug(
+          `Upload attempt ${attempt} failed: ${(error as Error).message}`,
+        );
+
+        if (attempt < maxAttempts) {
+          await this.waitForRetry(attempt);
+        }
+      }
     }
+
+    throw new Error(
+      `Failed to upload "${file}" after ${maxAttempts} attempts: ${(lastError as Error).message}`,
+      {
+        cause: lastError,
+      },
+    );
   }
 
   private buildResultUrl(result: PutObjectResult, objectName: string): string {
@@ -129,7 +149,10 @@ export default class UploadService extends Service {
     await new Promise((resolve) => setTimeout(resolve, backoffMs));
   }
 
-  public async uploadMultiple(files: string[], destNames?: string[]) {
+  public async uploadMultiple(
+    files: string[],
+    destNames?: string[],
+  ): Promise<string[]> {
     this.ensureInitialized();
 
     const uploads = files.map((file: string, index: number) => {
