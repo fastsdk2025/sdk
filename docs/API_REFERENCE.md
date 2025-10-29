@@ -1417,3 +1417,9 @@ export default class MyCommand extends CommandBase {
 - [核心组件](./CORE_COMPONENTS.md)
 - [内置服务](./BUILT_IN_SERVICES.md)
 - [最佳实践](./BEST_PRACTICES.md)
+
+---
+
+## 📖 文档导航
+
+**上一篇：** [最佳实践](./BEST_PRACTICES.md)

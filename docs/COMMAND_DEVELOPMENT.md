@@ -1041,3 +1041,10 @@ describe("UploadCommand Integration", () => {
 8. **编写测试**
 
 通过遵循这些指南，你可以开发出用户友好、功能强大的 CLI 命令。
+
+---
+
+## 📖 文档导航
+
+**上一篇：** [服务开发指南](./SERVICE_DEVELOPMENT.md)  
+**下一篇：** [最佳实践](./BEST_PRACTICES.md)

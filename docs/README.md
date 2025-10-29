@@ -117,3 +117,9 @@ const config = this.requireService("config"); // ConfigService
 ## 📄 许可证
 
 请查看项目根目录的 LICENSE 文件。
+
+---
+
+## 📖 文档导航
+
+**下一篇：** [快速开始](./GETTING_STARTED.md)

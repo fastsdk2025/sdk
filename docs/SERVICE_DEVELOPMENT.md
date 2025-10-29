@@ -1049,3 +1049,10 @@ export default class MyService extends Service {
 7. **正确清理资源**
 
 通过遵循这些指南，你可以开发出高质量、可维护的服务。
+
+---
+
+## 📖 文档导航
+
+**上一篇：** [内置服务文档](./BUILT_IN_SERVICES.md)  
+**下一篇：** [命令开发指南](./COMMAND_DEVELOPMENT.md)

@@ -500,3 +500,10 @@ public async onInit(): Promise<void> {
 4. 查看示例项目
 
 祝你使用愉快！🚀
+
+---
+
+## 📖 文档导航
+
+**上一篇：** [README](./README.md)  
+**下一篇：** [架构概述](./ARCHITECTURE.md)
