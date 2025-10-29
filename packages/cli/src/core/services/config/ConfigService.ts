@@ -13,78 +13,78 @@ export default class ConfigService extends Service {
   private static readonly DEBOUNCE_DELAY = CONFIG.DEBOUNCE_DELAY;
 
   private data!: IConfig;
-  private saveTimeout: NodeJS.Timeout | null = null
-  private logger!: LoggerService
+  private saveTimeout: NodeJS.Timeout | null = null;
+  private logger!: LoggerService;
 
   public onRegister(): void {
-    this.logger = this.requireService("logger")
-    this.loadConfig()
-    process.on("exit", this.flush.bind(this))
+    this.logger = this.requireService("logger");
+    this.loadConfig();
+    process.on("exit", this.flush.bind(this));
   }
 
   public async onDestroy(): Promise<void> {
-    this.flush()
+    this.flush();
   }
 
   public loadConfig(): void {
-    ensureDir(dirname(ConfigService.CONFIG_FILE))
+    ensureDir(dirname(ConfigService.CONFIG_FILE));
     try {
-      this.data = readJSON<IConfig>(ConfigService.CONFIG_FILE)
+      this.data = readJSON<IConfig>(ConfigService.CONFIG_FILE);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-        this.data = this.getDefaultConfig()
-        this.requestSave()
+        this.data = this.getDefaultConfig();
+        this.requestSave();
       } else if (error instanceof SyntaxError) {
-        this.logger.error("Config file corrupted, creating backup...")
-        this.data = this.getDefaultConfig()
-        this.requestSave()
+        this.logger.error("Config file corrupted, creating backup...");
+        this.data = this.getDefaultConfig();
+        this.requestSave();
       } else {
-        throw new Error(`Failed to load config: ${error}`, { cause: error })
+        throw new Error(`Failed to load config: ${error}`, { cause: error });
       }
     }
   }
 
   private getDefaultConfig(): IConfig {
     return {
-      cloud: {}
-    }
+      cloud: {},
+    };
   }
 
   public save(): void {
-    writeJSON(ConfigService.CONFIG_FILE, this.data)
+    writeJSON(ConfigService.CONFIG_FILE, this.data);
   }
 
   private requestSave(): void {
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout)
+      clearTimeout(this.saveTimeout);
     }
 
     this.saveTimeout = setTimeout(() => {
       this.save();
-      this.saveTimeout = null
+      this.saveTimeout = null;
     }, ConfigService.DEBOUNCE_DELAY);
   }
 
   public flush(): void {
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout)
+      clearTimeout(this.saveTimeout);
     }
 
-    this.save()
+    this.save();
   }
 
   public get<K extends keyof IConfig>(key: K): IConfig[K] {
-    return this.data[key]
+    return this.data[key];
   }
 
   public set<K extends keyof IConfig>(key: K, value: IConfig[K]): void {
     this.data[key] = value;
-    this.requestSave()
+    this.requestSave();
   }
 
   public delete<K extends keyof IConfig>(key: K): void {
-    delete this.data[key]
-    this.requestSave()
+    delete this.data[key];
+    this.requestSave();
   }
 
   public has<K extends keyof IConfig>(key: K): boolean {
