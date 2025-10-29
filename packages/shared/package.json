@@ -1,0 +1,14 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "utils",
+    "fast"
+  ],
+  "author": "tuiu <13719283454@163.com>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.17.1"
+}
