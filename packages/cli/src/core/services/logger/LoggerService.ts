@@ -9,42 +9,42 @@ export default class LoggerService extends Service {
   private logLevel: LogLevelLiteral = LOGGER.DEFAULT_LEVEL;
 
   private _log(level: LogLevelLiteral, ...args: unknown[]) {
-    if (level === "silent") return
-    if (LogLevel[level].priority < LogLevel[this.logLevel].priority) return
+    if (level === "silent") return;
+    if (LogLevel[level].priority < LogLevel[this.logLevel].priority) return;
 
     const line: unknown[] = [this.getDate(), LogLevel[level].level()];
 
     if (typeof args[0] === "string") {
-      line.push(LogLevel[level].color(args[0]))
-      line.push(...args.slice(1))
+      line.push(LogLevel[level].color(args[0]));
+      line.push(...args.slice(1));
     } else {
-      line.push(...args)
+      line.push(...args);
     }
 
-    console.log(...line)
+    console.log(...line);
   }
 
   private getDate() {
-    return chalk.dim.gray(`[${formatDate(new Date(), LOGGER.DATE_FORMAT)}]`)
+    return chalk.dim.gray(`[${formatDate(new Date(), LOGGER.DATE_FORMAT)}]`);
   }
 
   public setLevel(logLevel: LogLevelLiteral) {
-    this.logLevel = logLevel
+    this.logLevel = logLevel;
   }
 
   public info(...args: unknown[]) {
-    this._log("info", ...args)
+    this._log("info", ...args);
   }
 
   public debug(...args: unknown[]) {
-    this._log("debug", ...args)
+    this._log("debug", ...args);
   }
 
   public warn(...args: unknown[]) {
-    this._log("warn", ...args)
+    this._log("warn", ...args);
   }
 
   public error(...args: unknown[]) {
-    this._log("error", ...args)
+    this._log("error", ...args);
   }
 }
