@@ -27,5 +27,8 @@
   ],
   "author": "tuiu <13719283454@163.com>",
   "license": "MIT",
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.17.1",
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
 }
