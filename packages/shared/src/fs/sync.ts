@@ -1,19 +1,7 @@
-import { readdirSync, statSync } from "node:fs"
-import {join, resolve} from "node:path";
+import { walkSync, walkFilesSync, walkDirectoriesSync } from "@/fs/walk.ts"
 
-interface WalKOptions {
-  recursive?: boolean;
-}
-
-const defaultOptions: WalKOptions = {
-  recursive: false,
-}
-
-export function* walkSync(
-  base: string,
-  options: WalKOptions = {}
-) {
-  const opts = { ...defaultOptions, ...options }
-  const root = resolve(base)
-
+export {
+  walkDirectoriesSync,
+  walkFilesSync,
+  walkSync
 }
