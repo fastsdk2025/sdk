@@ -18,3 +18,5 @@ export interface WalkOptions {
   onError?: (error: Error, entry: WalkEntry) => void;
   order?: "pre" | "post";
 }
+
+export type BufferLike = Buffer | ArrayBuffer | SharedArrayBuffer | Uint8Array | DataView;
