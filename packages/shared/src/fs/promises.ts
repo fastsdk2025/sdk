@@ -29,7 +29,7 @@ export async function readArrayBuffer(filePath: string): Promise<ArrayBuffer> {
   }
 }
 
-export async function ensureDir(dir: string) {
+export async function ensureDir(dir: string): Promise<void> {
   try {
     await mkdir(dir, { recursive: true })
   } catch (error) {
@@ -50,7 +50,7 @@ export async function readJSON<T extends object>(
   }
 }
 
-export async function writeText(filePath: string, content: string) {
+export async function writeText(filePath: string, content: string): Promise<void> {
   try {
     await ensureDir(dirname(filePath))
     await writeFile(filePath, content, "utf-8")
@@ -61,7 +61,7 @@ export async function writeText(filePath: string, content: string) {
   }
 }
 
-export async function writeArrayBuffer(filePath: string, buffer: BufferLike) {
+export async function writeArrayBuffer(filePath: string, buffer: BufferLike): Promise<void> {
   try {
     await ensureDir(dirname(filePath))
     const content = toBuffer(buffer);
@@ -78,7 +78,7 @@ export async function writeJSON(
   filePath: string,
   data: unknown,
   pretty: boolean = true
-) {
+): Promise<void> {
   try {
     await ensureDir(dirname(filePath))
     await writeFile(filePath, JSON.stringify(data, null, pretty ? 2 : 0))
